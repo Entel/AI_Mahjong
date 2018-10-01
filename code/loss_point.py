@@ -28,11 +28,12 @@ SHAPE = [6, 6, 108]
 epochs = 3000
 batch_size = 32
 
-DATAPATH = '../shuf_xml_record.dat'
+DATAPATH = '../xml_data/lp_rd_collect_data.dat'
 TRAININGPATH = '../xml_data/lp_training.dat'
 VALIDPATH = '../xml_data/lp_validation.dat'
 LOSS_POINT_PATH = '../model/loss_point_without_zimo.model'
-CHECKPOINT_PATH = '../checkpoint/loss_point/weights_without_zimo.best.hdf5'
+CHECKPOINT_PATH = '../checkpoint/loss_point/weights.best.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/loss_point/weights_training.best.hdf5'
 
 class lossPointPredict:
     def __init__(self):
@@ -46,30 +47,37 @@ class lossPointPredict:
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='auto')
+        self.checkpoint_training = ModelCheckpoint(T_CHECKPOINT_PATH, 
+                                    monitor='acc', 
+                                    verbose=1, 
+                                    save_best_only=True, 
+                                    mode='auto')
 
     def create_model(self):
         model = Sequential()
         
         model.add(Conv2D(512, (2, 2), padding='same', input_shape=input_shape))
-        model.add(Conv2D(512, (3, 3), padding='same'))
+        model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
         model.add(Conv2D(512, (4, 4), padding='same', activation='relu', name='layer_512'))
         model.add(Dropout(0.25))
 
-        model.add(Conv2D(256, (2, 2), padding='same'))
-        model.add(Conv2D(256, (3, 3), padding='same'))
-        model.add(Conv2D(256, (2, 2), padding='same', activation='relu', name='layer_256'))
-        model.add(Dropout(0.25))
-        model.add(MaxPooling2D(pool_size=2, padding='same'))
+        model.add(Conv2D(256, (2, 2), padding='same', activation='relu'))
+        model.add(Conv2D(256, (3, 3), padding='same', activation='relu', name='layer_256'))
+        model.add(Conv2D(128, (2, 2), padding='same', activation='relu'))
+        model.add(Dropout(0.5))
+        #model.add(MaxPooling2D(pool_size=(2, 2)))
 
-        model.add(Conv2D(64, (2, 2), padding='same'))
+        '''
+        model.add(Conv2D(64, (2, 2), padding='same', activation='relu'))
         model.add(Conv2D(64, (3, 3), padding='same', activation='relu', name='layer_64'))
-        model.add(Dropout(0.25))
+        model.add(Dropout(0.75))
+        '''
 
         model.add(Flatten())
-        model.add(Dense(32, activation='relu'))
+        model.add(Dense(128, activation='relu'))
         model.add(Dense(14, activation='softmax'))
     
-        adam = Adam(lr=10e-7)
+        adam = Adam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
         model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['acc'])
 
         model.summary()
@@ -102,7 +110,8 @@ class lossPointPredict:
                 x, y = dg.lp_data_gen(item)
                 batch_x.append(np.reshape(x, SHAPE))
                 batch_y.append(y)
-            model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, validation_data=(np.array(valid_x), np.array(valid_y)) ,shuffle=True, callbacks=[self.tensorboard, self.checkpoint])
+        model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, validation_data=(np.array(valid_x), np.array(valid_y)) ,shuffle=True, callbacks=[self.tensorboard, self.checkpoint, self.checkpoint_training])
+        #model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, validation_split=0.2, shuffle=True, callbacks=[self.tensorboard, self.checkpoint, self.checkpoint_training])
                             
         model.save(LOSS_POINT_PATH)
         return model

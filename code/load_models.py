@@ -14,7 +14,30 @@ from keras.optimizers import Adam
 from keras.utils import np_utils
 
 TEN_MATRIX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 16, 18, 24]
-LOSS_POINT_MODEL = '../model/loss_point.model'
+VALUE_SHAPE = [6, 6, 108] 
+
+LOSS_POINT_MODEL = '../checkpoint/loss_point/weights_training.best.hdf5'
+ZIMO_DATA = '../xml_data/zimo.dat'
+
+
+def zimo_data_generator(datapath):
+    batch_x, batch_y = [], []
+    count = 0
+    with open(datapath) as f:
+        for line in f:
+            gen = gs.data_gen_value(line)
+            for item in gen:
+                pass
+            x, y = dg.lp_data_gen(item)
+            batch_x.append(np.reshape(x, VALUE_SHAPE))
+            batch_y.append(y)
+            count += 1
+            
+            if count == 64:
+                yield np.array(batch_x), np.array(batch_y)
+                count = 0
+                batch_x = []
+                batch_y = []
 
 class Prediction:
     def __init__(self):
@@ -25,6 +48,10 @@ class Prediction:
     def loss_point_pred(self, x):
         self.lp_model.load_weights('../checkpoint/loss_point/weights_without_zimo.best.hdf5')
         return self.lp_model.predict(np.reshape(x, [1, 6, 6, 108]))
+
+    def loss_point_evaluate(self):
+        self.lp_model.load_weights(LOSS_POINT_MODEL)
+        return self.lp_model.evaluate_generator(zimo_data_generator(ZIMO_DATA), steps=1000)
 
 if __name__ == '__main__':
     
@@ -40,6 +67,8 @@ if __name__ == '__main__':
     ['D94', [[6, 3, 106, 94, 79, 98, 82, 37, 101, 73, 69, 38, 74, 63], [25, 32, 81, 50, 54, 43, 88, 28, 78, 93, 116, 125, 90], [61, 97, 111, 110, 95, 89, 57, 16, 52, 22], [64, 58, 76, 66, 84, 96, 67, 80, 60, 99]], [[], [], [[42, 44, 49]], [[7, 10, 12]]], [[118, 48, 56, 14, 122, 103, 30, 109, 100, 92], [117, 121, 107, 112, 123, 108, 4, 8, 17, 51, 42], [77, 72, 70, 10, 131, 71, 1, 120, 85, 91, 59], [128, 113, 26, 105, 45, 102, 87, 119, 47, 135, 35]], [33], 1, [], [['123', '-3', '226', '-5', '312', '-3', '339', '11']], [3], [3]]]
 
     pred = Prediction()
+    print pred.loss_point_evaluate()
+    '''
     for test in testli:
         data = dg.data2tiles(test)
         data = dg.mesen_transfer(data)
@@ -47,3 +76,4 @@ if __name__ == '__main__':
         if batch[0]:
             loss_pred = pred.loss_point_pred(batch[1])
             print loss_pred
+    '''

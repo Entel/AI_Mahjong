@@ -7,6 +7,8 @@ To add up the data into balance for training
 '''
 
 XML_DATA = '../xml_data/shuf_xml_record.dat'
+ZIMO_DATA = '../xml_data/zimo.dat'
+HOZYU_DATA = '../xml_data/hozyu.dat'
 LP_XML_DATA = '../xml_data/lp_rd_collect_data.dat'
 LP_TRAINING = '../xml_data/lp_training.dat'
 LP_VALIDATION = '../xml_data/lp_validation.dat'
@@ -40,14 +42,28 @@ class ResultStatistics():
     @staticmethod
     def agari_tag(root):
         agaris = []
+        who = []
         zimo =  True
         for agari in root.iter('AGARI'):
-            who = agari.get('who')
+            who.append(int(agari.get('who')))
             fromWho = agari.get('fromWho')
-            if who != fromWho:
+            if who[0] != int(fromWho):
                 zimo = False
             agaris.append(agari)
-        return zimo, agaris
+        return zimo, agaris, who
+
+    @staticmethod
+    def agari_type_classification():
+        with open(XML_DATA) as f:
+            for line in f:
+                root = ResultStatistics.init_data(line)
+                zimo, agaris, who = ResultStatistics.agari_tag(root)
+                if zimo:
+                    with open(ZIMO_DATA, 'a+') as zdf:
+                        zdf.write(line)
+                else:
+                    with open(HOZYU_DATA, 'a+') as hdf:
+                        hdf.write(line)
 
     @staticmethod
     def lp_add_up(datapath):
@@ -55,7 +71,7 @@ class ResultStatistics():
         with open(datapath, 'r') as f:
             for line in f:
                 root = ResultStatistics.init_data(line)
-                zimo, agaris = ResultStatistics.agari_tag(root)
+                zimo, agaris, who = ResultStatistics.agari_tag(root)
                 if not zimo:
                     for agari in agaris:
                         st[ResultStatistics.ten_range(agari)] += 1
@@ -73,9 +89,20 @@ class ResultStatistics():
         with open(datapath, 'r') as f:
             for line in f:
                 root = ResultStatistics.init_data(line)
-                zimo, agaris = ResultStatistics.agari_tag(root)
+                zimo, agaris, who = ResultStatistics.agari_tag(root)
                 for agari in agaris:
                     st[ResultStatistics.waiting_tile(agari)] += 1
+        return st
+
+    @staticmethod
+    def wton_add_up(datapath):
+        st = [0 for i in range(4)]
+        with open(datapath, 'r') as f:
+            for line in f:
+                root = ResultStatistics.init_data(line)
+                zimo, agaris, who = ResultStatistics.agari_tag(root)
+                for _who in who:
+                    st[_who] += 1
         return st
 
     @staticmethod
@@ -142,11 +169,13 @@ class ResultStatistics():
 
 if __name__ == '__main__':
     #print ResultStatistics.lp_collect_data()
-    #print ResultStatistics.lp_add_up(LP_XML_DATA)
+    #print ResultStatistics.lp_add_up('../xml_data/1.xml')
     #print ResultStatistics.add_up('../xml_data/xml_valid_record.dat')
     #print ResultStatistics.machi_add_up('../xml_data/shuf_xml_record.dat')
     #print ResultStatistics.wt_collect_data()
     #print ResultStatistics.wt_add_up(WT_XML_DATA)
-    ResultStatistics.file_division(11200, LP_XML_DATA, LP_TRAINING, LP_VALIDATION)
+    #ResultStatistics.file_division(11200, LP_XML_DATA, LP_TRAINING, LP_VALIDATION)
     print ResultStatistics.lp_add_up(LP_TRAINING)
     print ResultStatistics.lp_add_up(LP_VALIDATION)
+    #print ResultStatistics.wton_add_up(XML_DATA)
+    #ResultStatistics.agari_type_classification()
