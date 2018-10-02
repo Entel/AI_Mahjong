@@ -166,6 +166,24 @@ class ResultStatistics():
                     with open(validation_data, 'a+') as vdf:
                         vdf.write(line)
                     
+    @staticmethod
+    def wton_agari_process(root):    
+        agaris = []
+        who = []
+        zimo =  True
+        for agari in root.iter('AGARI'):
+            who.append(int(agari.get('who')))
+            fromWho = agari.get('fromWho')
+            if who[0] != int(fromWho):
+                zimo = False
+            agaris.append(agari)
+        return zimo, agaris, who
+
+    @staticmethod
+    def wton_add_up(datapath):
+        with open(datapath) as f:
+            for line in f:
+                
 
 if __name__ == '__main__':
     #print ResultStatistics.lp_collect_data()
