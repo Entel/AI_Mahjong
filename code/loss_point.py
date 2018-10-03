@@ -77,7 +77,7 @@ class lossPointPredict:
         model.add(Dense(128, activation='relu'))
         model.add(Dense(14, activation='softmax'))
     
-        adam = Adam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+        adam = Adam(lr=1e-07, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
         model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['acc'])
 
         model.summary()
