@@ -2,7 +2,6 @@ import numpy as np
 import copy
 import math
 from game_simulation import GameSimulation as gs
-from training_data_policy import DataGenerator as tdp
 
 tile_matrix = [[3, 1], [2, 2], [2, 3], [2, 4], [3, 3], [3, 4], [4, 4], [4, 5], [5, 5],
     [5, 4], [0, 0], [1, 0], [1, 1], [0, 2], [1, 2], [2, 1], [2, 0], [3, 0],
@@ -102,27 +101,142 @@ class DataGenerator:
         return tile_matrix
 
     @staticmethod
+    def dora_gen(doras):
+        dora_matrix = [[0 for i in range(6)] for j in range(6)]
+        for dora in doras:
+            x, y = DataGenerator.x_y(dora)
+            dora_matrix[x][y] = 1
+        return dora_matrix
+
+    @staticmethod
+    def invisual_tiles(data):
+        inv_matrix = [[1 for i in range(6)] for j in range(6)]
+        for tile in data[1][0]:
+            x, y = DataGenerator.x_y(tile)
+            inv_matrix[x][y] -= 0.25
+        for i in range(1, 4):
+            if data[2][i] != []:
+                for item in data[2][i]:
+                    for tile in item:
+                        x, y = DataGenerator.x_y(tile)
+                        inv_matrix[x][y] -= 0.25
+        for kawa in data[3]:
+            for tile in kawa:
+                x, y = DataGenerator.x_y(tile)
+                if inv_matrix[x][y] > 0:
+                    inv_matrix[x][y] -= 0.25
+        return inv_matrix
+
+    @staticmethod
+    def discardable_gen(hands, mentsus):
+        '''
+        genertate the tile that can discard
+        '''
+        dis_matrix = [[0 for i in range(6)] for j in range(6)]
+        hand = list(hands[0])
+        if mentsus[0] != []:
+            for mentsu in mentsus[0]:
+                for item in mentsu:
+                    if item in hand:
+                        hand.remove(item)
+        for item in hand:
+            x, y = DataGenerator.x_y(item)
+            dis_matrix[x][y] += 0.25
+        return dis_matrix
+
+    @staticmethod
+    def return_to_last_turn(data):
+        who = data[0][0]
+        tile = int(data[0][1:])
+        if who == 'D':
+            i = 0
+        elif who == 'E':
+            i = 1
+        elif who == 'F':
+            i = 2
+        elif who == 'G':
+            i = 3
+        data[1][i].append(data[3][i].pop())
+
+    @staticmethod
+    def hands_gen(turn, data, mentsu, oya, reach):
+        '''
+        genertate hands from the table status
+        own: hands
+        oppenent: mentsu
+        '''
+        hands = [[[0 for i in range(6)] for j in range(6)] for k in range(4)]
+        tile = data[0]
+        for item in tile:
+            x, y = DataGenerator.x_y(item)
+            hands[0][x][y] += 0.25
+        for i in range(1, 4):
+            if mentsu[i] != []:
+                for item in mentsu[i]:
+                    for item2 in item:
+                        x, y = DataGenerator.x_y(item2)
+                        hands[i][x][y] += 0.25
+        hands[oya][oya_site[0]][oya_site[1]] = 1
+        if reach != []:
+            for item in reach:
+                hands[item][reach_site[0]][reach_site[1]] = 1
+        return hands
+
+    @staticmethod
+    def turns_gen(kawa):
+        '''
+        generate a list of discarded tiles in every turn(max_turn*4*6*6) and a list of all tiles discarded(4*6*6)
+        '''
+        turns_0 = [[[0 for i in range(6)] for j in range(6)] for k in range(MAX_TURN)]
+        turns_1 = [[[0 for i in range(6)] for j in range(6)] for k in range(MAX_TURN)]
+        turns_2 = [[[0 for i in range(6)] for j in range(6)] for k in range(MAX_TURN)]
+        turns_3 = [[[0 for i in range(6)] for j in range(6)] for k in range(MAX_TURN)]
+        kawa_matrix = [[[0 for i in range(6)] for j in range(6)] for k in range(4)]
+        for i in range(len(kawa[0])):
+            x, y = DataGenerator.x_y(kawa[0][i])
+            turns_0[i][x][y] = 1
+        for i in range(len(kawa[1])):
+            x, y = DataGenerator.x_y(kawa[1][i])
+            turns_1[i][x][y] = 1
+        for i in range(len(kawa[2])):
+            x, y = DataGenerator.x_y(kawa[2][i])
+            turns_2[i][x][y] = 1
+        for i in range(len(kawa[3])):
+            x, y = DataGenerator.x_y(kawa[3][i])
+            turns_3[i][x][y] = 1
+        
+        for i in range(4):
+            for tile in kawa[i]:
+                x, y = DataGenerator.x_y(tile)
+                kawa_matrix[i][x][y] += 0.25
+
+        return turns_0, turns_1, turns_2, turns_3, kawa_matrix
+
+    '''
+    Loss point training data generator
+    '''
+    @staticmethod
     def lp_x_gen(data):
         x = []
 
-        hands = tdp.hands_gen(data[0][0], data[1], data[2], data[5], data[6])
+        hands = DataGenerator.hands_gen(data[0][0], data[1], data[2], data[5], data[6])
         for hand in hands:
             x.append(hand) #4 layers
         
-        kawas = tdp.turns_gen(data[3])
+        kawas = DataGenerator.turns_gen(data[3])
         for i in range(MAX_TURN):
             for j in range(4):
                 x.append(kawas[j][i]) #4*24 layers
         for i in range(4):
             x.append(kawas[4][i]) #4 layers
 
-        dora = tdp.dora_gen(data[4])
+        dora = DataGenerator.dora_gen(data[4])
         x.append(dora) #1 layers
     
-        invisual = tdp.invisual_tiles(data)
+        invisual = DataGenerator.invisual_tiles(data)
         x.append(invisual) #1 layers
 
-        discardable = tdp.discardable_gen(data[1], data[2])
+        discardable = DataGenerator.discardable_gen(data[1], data[2])
         x.append(discardable) #1 layers
 
         discarded = DataGenerator.discarded_gen(gs.num2tiles(int(data[0][1:])))
@@ -146,7 +260,7 @@ class DataGenerator:
         '''     
         for loss_point in data[7]:
             ten += loss_point
-        ten = ten / 1000
+        ten = ten // 1000
         if ten == 0:
             ten = 1
         elif ten >= 12 and ten < 16:
@@ -208,42 +322,31 @@ class DataGenerator:
         return False, [], []
     '''
 
-    @staticmethod
-    def return_to_last_turn(data):
-        who = data[0][0]
-        tile = int(data[0][1:])
-        if who == 'D':
-            i = 0
-        elif who == 'E':
-            i = 1
-        elif who == 'F':
-            i = 2
-        elif who == 'G':
-            i = 3
-        data[1][i].append(data[3][i].pop())
-
+    '''
+    Waiting tiles data generator
+    '''
     @staticmethod
     def wt_x_gen(data):
         x = []
 
-        hands = tdp.hands_gen(data[0][0], data[1], data[2], data[5], data[6])
+        hands = DataGenerator.hands_gen(data[0][0], data[1], data[2], data[5], data[6])
         for hand in hands:
             x.append(hand) #4 layers
         
-        kawas = tdp.turns_gen(data[3])
+        kawas = DataGenerator.turns_gen(data[3])
         for i in range(MAX_TURN):
             for j in range(4):
                 x.append(kawas[j][i]) #4*24 layers
         for i in range(4):
             x.append(kawas[4][i]) #4 layers
 
-        dora = tdp.dora_gen(data[4])
+        dora = DataGenerator.dora_gen(data[4])
         x.append(dora) #1 layers
     
-        invisual = tdp.invisual_tiles(data)
+        invisual = DataGenerator.invisual_tiles(data)
         x.append(invisual) #1 layers
 
-        discardable = tdp.discardable_gen(data[1], data[2])
+        discardable = DataGenerator.discardable_gen(data[1], data[2])
         x.append(discardable) #1 layers
 
         return x
@@ -261,6 +364,31 @@ class DataGenerator:
         mesen_data = DataGenerator.data2tiles(mesen_data)
         return DataGenerator.wt_x_gen(mesen_data), DataGenerator.wt_y_gen(mesen_data)
 
+    '''
+    predict waiting or not 
+    '''
+    def wton_y_gen(data):
+        _wton = [0 for i in range(4)]
+        who = data[8][0]
+        fromWho = data[9][0]
+        if fromWho == 0:
+            _wton[who] = 1
+        elif fromWho == 1:
+            _wton[(who + 3) % 4] = 1
+        elif fromWho == 2:
+            _wton[(who + 2) % 4] = 1
+        elif fromWho == 3:
+            _wton[(who + 1) % 4] = 1
+        return _wton[1:]
+        
+    def wton_data_gen(_data):
+        DataGenerator.return_to_last_turn(_data)
+        print(_data)
+        mesen_data = DataGenerator.mesen_transfer(_data)
+        print(mesen_data)
+        mesen_data = DataGenerator.data2tiles(mesen_data)
+        return DataGenerator.wt_x_gen(mesen_data), DataGenerator.wton_y_gen(mesen_data)
+
 if __name__ == '__main__':
     testli = [['F30', [[80, 18, 111, 108, 91, 94, 56, 60, 26, 83, 97, 52, 110], [25, 64, 12, 14, 44, 36, 6, 40, 84, 21, 89, 58, 50], [49, 23, 30, 87, 22, 61, 82, 99, 95, 53, 92, 55, 98, 93], [86, 29, 13, 15, 20, 19, 42, 8, 39, 46, 51, 88, 1]], [[], [], [], []], [[31, 122, 128, 102, 106, 127, 11, 54, 90], [116, 100, 131, 126, 135, 0, 2, 65, 34], [38, 121, 125, 5, 75, 74, 70, 3], [117, 130, 41, 73, 79, 77, 68, 59]], [14], 0, [], [['245', '273', '235', '-243', '255', '0', '235', '0']], [0], [1]],
     ['G35', [[80, 18, 111, 108, 91, 94, 56, 60, 26, 83, 97, 52, 110], [25, 64, 12, 14, 44, 36, 6, 40, 84, 21, 89, 58, 50], [49, 23, 87, 22, 61, 82, 99, 95, 53, 92, 55, 98, 93], [86, 29, 13, 15, 20, 19, 42, 8, 39, 46, 51, 88, 1, 35]], [[], [], [], []], [[31, 122, 128, 102, 106, 127, 11, 54, 90], [116, 100, 131, 126, 135, 0, 2, 65, 34], [38, 121, 125, 5, 75, 74, 70, 3, 30], [117, 130, 41, 73, 79, 77, 68, 59]], [14], 0, [], [['245', '273', '235', '-243', '255', '0', '235', '0']], [0], [1]],
@@ -275,10 +403,10 @@ if __name__ == '__main__':
     #for test in testli:
     with open('../xml_data/fz_test.dat') as f:
         for line in f:
-            print line
+            print(line)
             gen = gs.data_gen_value(line)
             for test in gen:
                 pass
-            print test
-            DataGenerator.lp_data_gen(test)
+            print(test)
+            print(DataGenerator.wton_data_gen(test)[1])
 

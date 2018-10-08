@@ -152,6 +152,7 @@ if __name__ == '__main__':
             ura = _ura.split(',')
     ''' 
     
+    ''' 
     data_path = process.list_path_of_data()
     for data_file in data_path:
         print data_file
@@ -167,7 +168,6 @@ if __name__ == '__main__':
             tiles.append(process.num2tiles(tile))
         process.add_to_csv(final_hai_file, tiles)
         print tiles
-    ''' 
     print process.mentsu_process(44107)
     print process.mentsu_process(42603)
     print process.mentsu_process(71)

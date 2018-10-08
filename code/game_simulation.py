@@ -35,7 +35,6 @@ class game_record:
         drt = os.listdir(record_dir)
         for f in drt:
             file_path = record_dir + f
-            print file_path
             game_tree = ET.parse(file_path)
             game_sim = self.get_game_record(game_tree)
             with open(save_path, 'a+') as f:
@@ -319,8 +318,8 @@ class GameSimulation:
     @staticmethod
     def num2tiles(num):
         num = int(num)
-        mpsz = num / 36 #caculate weather a tile is m or p or s or z
-        hai = mpsz * 9 + ((num % 36) / 4)
+        mpsz = num // 36 #caculate weather a tile is m or p or s or z
+        hai = mpsz * 9 + ((num % 36) // 4)
         return hai
 
     #due with the m to get the mentsu
@@ -334,8 +333,8 @@ class GameSimulation:
         if (m & (1 << 2)): #SYUNTSU
             t = (m & 0xFC00) >> 10
             r = t % 3 
-            t /= 3
-            t = (t / 7) * 9 + (t % 7)
+            t //= 3
+            t = (t // 7) * 9 + (t % 7)
             t *= 4
             h = [t + 4 * 0 + ((m & 0x0018) >> 3),
                     t + 4 * 1 + ((m & 0x0060) >> 5),
@@ -344,7 +343,7 @@ class GameSimulation:
             unused = (m & 0x0060) >> 5
             t = (m & 0xFE00) >> 9
             r = t % 3
-            t = t / 3
+            t = t // 3
             t *= 4
             h = [t, t, t]
 
@@ -369,7 +368,7 @@ class GameSimulation:
             added = (m & 0x0060) >> 5
             t = (m & 0xFE00) >> 9
             r = t % 3
-            t /= 3
+            t //= 3
             t *= 4
             h = [t, t+1, t+2, t+3]
             
@@ -377,7 +376,7 @@ class GameSimulation:
             hai0 = (m & 0xFF00) >> 8
             if not kui:
                 hai0 = (hai0 & ~3) + 3
-            t = (hai0 / 4) * 4
+            t = (hai0 // 4) * 4
             h = [t, t+1, t+2, t+3]
             
         return r, h
@@ -393,7 +392,6 @@ if __name__ == '__main__':
     print GameSimulation.concatenate_hands_and_mentsu(hands, mentsu)
     print hands 
     
-    '''
     with open('../xml_data/shuf_test.dat', 'r+') as f:
         tests = f.readlines()
     for test in tests:
@@ -408,6 +406,7 @@ if __name__ == '__main__':
             tile = item[3][item[8]].pop()
             item[1][item[8]].append(tile)
             print item
+    '''
     '''
         hands = GameSimulation.concatenate_hands_and_mentsu(item[1], item[2])
         for hai in hands:

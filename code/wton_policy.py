@@ -1,8 +1,7 @@
 import numpy as np
 from itertools import islice
 from game_simulation import GameSimulation as gs
-from training_data_policy import DataGenerator as dg
-from training_data_policy import tile_matrix, HAI, MAX_TURN
+from training_data_value import DataGenerator as dg
 
 import keras
 from keras.models import Sequential
@@ -14,17 +13,25 @@ from keras.initializers import uniform
 from keras.optimizers import Adam
 from keras.utils import np_utils
 
+config = tf.ConfigProto(
+    gpu_options = tf.GPUOptions(
+        visible_device_list = '0',
+        allow_growth = True
+    )
+)
+set_session(tf.Session(config=config))
+
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
-batch_size = 128
-epochs = 20
+batch_size = 32
+epochs = 1000
 nClasses = 4
 
-DATAPATH = '../xml_record.dat'
+TRAININGDATA = '../xml_data/wton_training.dat'
+VALIDATIONDATA = '../xml_data/wton_validation.dat'
 WTON_PARAM_PATH = '../model/wether_waiting.model'
-WT_PARAM_PATH = '../model/wether_waiting.model'
-
-
+CHECKPOINT_PATH = '../checkpoint/loss_point/wton.best.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/loss_point/wton.training.best.hdf5'
 
 class waitingOrNot:
     def __init__(self):
@@ -34,6 +41,11 @@ class waitingOrNot:
                                     embeddings_freq = 0)
         self.checkpoint = ModelCheckpoint(CHECKPOINT_PATH, 
                                     monitor='val_acc', 
+                                    verbose=1, 
+                                    save_best_only=True, 
+                                    mode='auto')
+        self.t_checkpoint = ModelCheckpoint(CHECKPOINT_PATH, 
+                                    monitor='acc', 
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='auto')
@@ -68,38 +80,42 @@ class waitingOrNot:
 
     def training(self):
         model = self.create_model()
-        line_count = 0
-        data_list = []
-        step = 1
-        batch_x = []
-        batch_y = []
-        with open(DATAPATH) as f:
-            for line in f:
-                if line_count != 64:
-                    line_count += 1
-                    data_list.append(line)
-                else:
-                    for data_line in data_list:
-                        gen = gs.data_gen(data_line)
-                        for item in gen:
-                            waiting, x, wt, y = dg.generate_data_for_waiting(item)
-                            if waiting:
-                                batch_x.append(np.reshape(x, SHAPE))
-                                batch_y.append(y)
-                    model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, shuffle=True, callbacks=[self.tensorboard])
-                    if step % 128 == 0:
-                        model.save(LOSS_POINT_PATH)
-                    step += 1
+        class_weight = {0: 77113, 1: 80232, 2: 85610}
 
-                    data_list = []
-                    batch_x = []
-                    batch_y = []
-                    line_count = 0
-                    data_list.append(line)
+        model.fit_generator(generator = generate_data_from_file(TRAININGDATA, batch_size),
+            samples_per_epoch = 7500,
+            epochs = epochs,
+            validation_data = generate_data_from_file(VALIDATIONDATA, batch_size),
+            validation_steps = 2437,
+            class_weight = class_weight,
+            use_multiprocessing = True,
+            workers = 16,
+            max_queue_size = 16,
+            callbacks=[self.tensorboard, self.checkpoint, self.t_checkpoint])
 
         model.save(WTON_PARAM_PATH)
         return model
-             
+
+def generate_data_from_file(path, batch_size):
+    batch_x, batch_y = [], []
+    count = 0
+    with open(path) as f:
+        for line in f:
+            gen = gs.data_gen_value(line)
+            for item in gen:
+                pass
+            x, y = dg.wton_data_gen(item)
+            batch_x.append(np.reshape(x, SHAPE))
+            batch_y.append(y)
+            count += 1
+            if count == batch_size:
+                yield np.array(batch_x), np.array(batch_y)
+                count = 0
+                batch_x = []
+                batch_y = []
+
+
+ 
 if __name__ == '__main__':
     '''
     with open('../test.dat') as f:

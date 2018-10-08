@@ -15,6 +15,9 @@ LP_VALIDATION = '../xml_data/lp_validation.dat'
 WT_XML_DATA = '../xml_data/wt_rd_collect_data.dat'
 WT_TRAINING = '../xml_data/wt_training.dat'
 WT_VALIDATION = '../xml_data/wt_validation.dat'
+HOZYU_TRAINING = '../xml_data/wton_training.dat'
+HOZYU_VALIDATION = '../xml_data/wton_validation.dat'
+
 TEN_MATRIX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 16, 18, 24]
 
 class ResultStatistics():
@@ -95,17 +98,6 @@ class ResultStatistics():
         return st
 
     @staticmethod
-    def wton_add_up(datapath):
-        st = [0 for i in range(4)]
-        with open(datapath, 'r') as f:
-            for line in f:
-                root = ResultStatistics.init_data(line)
-                zimo, agaris, who = ResultStatistics.agari_tag(root)
-                for _who in who:
-                    st[_who] += 1
-        return st
-
-    @staticmethod
     def num2tiles(num):
         num = int(num)
         mpsz = num / 36 #caculate weather a tile is m or p or s or z
@@ -132,7 +124,6 @@ class ResultStatistics():
                             with open(LP_XML_DATA, 'a+') as rf:
                                 rf.write(line)
                             st[ten_index] -= 1
-                            print st
 
         return st
 
@@ -151,7 +142,6 @@ class ResultStatistics():
                         with open(WT_XML_DATA, 'a+') as rf:
                             rf.write(line)
                         st[machi] -= 1
-                        print st
         return st
 
     @staticmethod
@@ -169,21 +159,36 @@ class ResultStatistics():
     @staticmethod
     def wton_agari_process(root):    
         agaris = []
-        who = []
+        whos = []
         zimo =  True
         for agari in root.iter('AGARI'):
-            who.append(int(agari.get('who')))
+            who = int(agari.get('who'))
+            whos.append(who)
             fromWho = agari.get('fromWho')
-            if who[0] != int(fromWho):
+            if whos[0] != int(fromWho):
                 zimo = False
-            agaris.append(agari)
-        return zimo, agaris, who
+        return zimo, int(fromWho), whos
 
     @staticmethod
     def wton_add_up(datapath):
+        st = [0 for i in range(4)]
         with open(datapath) as f:
             for line in f:
-                
+                root = ResultStatistics.init_data(line)
+                zimo, fromWho, who = ResultStatistics.wton_agari_process(root)
+                if fromWho == 0:
+                    for _who in who:
+                        st[_who] += 1
+                elif fromWho == 1:
+                    for _who in who:
+                        st[(_who + 3) % 4] += 1
+                elif fromWho == 2:
+                    for _who in who:
+                        st[(_who + 2) % 4] += 1
+                elif fromWho == 3:
+                    for _who in who:
+                        st[(_who + 1) % 4] += 1
+        return st
 
 if __name__ == '__main__':
     #print ResultStatistics.lp_collect_data()
@@ -193,7 +198,10 @@ if __name__ == '__main__':
     #print ResultStatistics.wt_collect_data()
     #print ResultStatistics.wt_add_up(WT_XML_DATA)
     #ResultStatistics.file_division(11200, LP_XML_DATA, LP_TRAINING, LP_VALIDATION)
-    print ResultStatistics.lp_add_up(LP_TRAINING)
-    print ResultStatistics.lp_add_up(LP_VALIDATION)
-    #print ResultStatistics.wton_add_up(XML_DATA)
+    #print ResultStatistics.lp_add_up(LP_TRAINING)
+    #print ResultStatistics.lp_add_up(LP_VALIDATION)
+    #print(ResultStatistics.wton_add_up(HOZYU_DATA))
     #ResultStatistics.agari_type_classification()
+    ResultStatistics.file_division(80000*3, HOZYU_DATA, HOZYU_TRAINING, HOZYU_VALIDATION)
+    print(ResultStatistics.wton_add_up(HOZYU_TRAINING))
+    print(ResultStatistics.wton_add_up(HOZYU_VALIDATION))

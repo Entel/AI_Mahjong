@@ -45,6 +45,11 @@ class WaitingTilesPrediction:
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='auto')
+        self.t_checkpoint = ModelCheckpoint(CHECKPOINT_PATH, 
+                                    monitor='acc', 
+                                    verbose=1, 
+                                    save_best_only=True, 
+                                    mode='auto')
         
     def create_model(self):
         model = Sequential()
@@ -94,7 +99,7 @@ class WaitingTilesPrediction:
             use_multiprocessing = True,
             workers = 16,
             max_queue_size = 16,
-            callbacks=[self.tensorboard, self.checkpoint])
+            callbacks=[self.tensorboard, self.checkpoint, self.t_checkpoint])
 
         model.save(WT_PARAM_PATH)
         return model
