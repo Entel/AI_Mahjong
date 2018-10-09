@@ -5,10 +5,10 @@ from training_data_value import DataGenerator as dg
 
 import keras
 import tensorflow as tf
-from keras.models import Sequential, load_model
-from keras.layers import Conv2D, MaxPooling2D
-from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
+from tensorflow.keras.models import Sequential, load_model
+from tensorflow.keras.layers import Conv2D, MaxPooling2D
+from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten
+from tensorflow.keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
 from keras.initializers import glorot_uniform
 from keras.initializers import uniform
 from keras.optimizers import Adam
