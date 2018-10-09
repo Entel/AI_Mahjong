@@ -137,7 +137,7 @@ class DataGenerator:
         if mentsus[0] != []:
             for mentsu in mentsus[0]:
                 for item in mentsu:
-                    if item in hand:0
+                    if item in hand:
                         hand.remove(item)
         for item in hand:
             x, y = DataGenerator.x_y(item)
