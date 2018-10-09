@@ -17,7 +17,7 @@ from keras.backend.tensorflow_backend import set_session
 
 config = tf.ConfigProto(
     gpu_options = tf.GPUOptions(
-        visible_device_list = '0',
+        visible_device_list = '0,1,2,3',
         allow_growth = True
     )
 )
@@ -72,7 +72,7 @@ class WaitingTilesPrediction:
         model.add(Dense(34))
         model.add(Activation('softmax'))
     
-        adam = Adam(lr=10e-7)
+        adam = Adam(lr=10e-6)
         model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
 
         model.summary()
@@ -97,8 +97,8 @@ class WaitingTilesPrediction:
             epochs = epochs,
             validation_data = (np.array(valid_x), np.array(valid_y)),
             use_multiprocessing = True,
-            workers = 16,
-            max_queue_size = 16,
+            workers = 3,
+            max_queue_size = 10,
             callbacks=[self.tensorboard, self.checkpoint, self.t_checkpoint])
 
         model.save(WT_PARAM_PATH)
