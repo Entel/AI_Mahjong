@@ -137,7 +137,7 @@ class DataGenerator:
         if mentsus[0] != []:
             for mentsu in mentsus[0]:
                 for item in mentsu:
-                    if item in hand:
+                    if item in hand:0
                         hand.remove(item)
         for item in hand:
             x, y = DataGenerator.x_y(item)
@@ -260,7 +260,7 @@ class DataGenerator:
         '''     
         for loss_point in data[7]:
             ten += loss_point
-        ten = ten // 1000
+        ten = int(round(ten / 1000))
         if ten == 0:
             ten = 1
         elif ten >= 12 and ten < 16:
