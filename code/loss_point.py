@@ -17,7 +17,7 @@ from keras.backend.tensorflow_backend import set_session
 
 config = tf.ConfigProto(
     gpu_options = tf.GPUOptions(
-        visible_device_list = '0',
+        visible_device_list = '0, 1',
         allow_growth = True
     )
 )
@@ -25,7 +25,7 @@ set_session(tf.Session(config=config))
 
 input_shape = (6, 6, 108)
 SHAPE = [6, 6, 108]
-epochs = 3000
+epochs = 1000
 batch_size = 32
 
 DATAPATH = '../xml_data/lp_rd_collect_data.dat'
@@ -74,7 +74,7 @@ class lossPointPredict:
         model.add(Flatten())
         model.add(Dense(1024, activation='relu'))
         model.add(Dense(256, activation='relu'))
-        model.add(Dense(14, activation='softmax'))
+        model.add(Dense(9, activation='softmax'))
     
         adam = Adam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
         model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['acc'])

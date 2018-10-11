@@ -14,7 +14,7 @@ HAI = ['1m', '2m', '3m', '4m', '5m', '6m', '7m', '8m', '9m',
     '1s', '2s', '3s', '4s', '5s', '6s', '7s', '8s', '9s',
     'Tou', 'nan', 'sya', 'pei', 'hak', 'hat', 'cyu' ]
 MAX_TURN = 24
-TEN_MATRIX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 16, 18, 24]
+TEN_MATRIX = [1, 2, 3, 4, 5, 6, 8, 12, 18]
 
 class DataGenerator:
     @staticmethod
@@ -263,16 +263,12 @@ class DataGenerator:
         ten = int(round(ten / 1000))
         if ten == 0:
             ten = 1
-        elif ten >= 12 and ten < 16:
+        elif ten >= 7 and ten < 8:
+            ten = 8
+        elif ten >= 9 and ten < 12:
             ten = 12
-        elif ten >=16 and ten <18:
-            ten = 16
-        elif ten >=18 and ten <24:
+        elif ten > 12:
             ten = 18
-        elif ten >=24:
-            ten = 24
-        if ten == 10:
-            ten = 9
         y[TEN_MATRIX.index(ten)] = 1
         return y
 
