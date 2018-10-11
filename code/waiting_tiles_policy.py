@@ -32,7 +32,8 @@ TRAININGDATA = '../xml_data/wt_training.dat'
 VALIDATIONDATA = '../xml_data/wt_validation.dat'
 WTON_PARAM_PATH = '../model/wether_waiting.model'
 WT_PARAM_PATH = '../model/waiting_tile.model'
-CHECKPOINT_PATH = '../checkpoint/loss_point/weaiting_tiles.best.hdf5'
+CHECKPOINT_PATH = '../checkpoint/waiting_tiles/waiting_tiles.improvement_{epoch:02d}_{valcc:.2f}.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/waiting_tiles/waiting_tiles.t_improvement_{epoch:02d}_{valcc:.2f}.hdf5'
 
 class WaitingTilesPrediction:
     def __init__(self):
@@ -45,7 +46,7 @@ class WaitingTilesPrediction:
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='auto')
-        self.t_checkpoint = ModelCheckpoint(CHECKPOINT_PATH, 
+        self.t_checkpoint = ModelCheckpoint(T_CHECKPOINT_PATH, 
                                     monitor='acc', 
                                     verbose=1, 
                                     save_best_only=True, 
@@ -61,7 +62,7 @@ class WaitingTilesPrediction:
 
         model.add(Conv2D(256, (2, 2), padding='same'))
         model.add(Conv2D(256, (3, 3), padding='same', activation='relu'))
-        model.add(Dropout(0.25))
+        model.add(Dropout(0.5))
 
         model.add(Conv2D(128, (2, 2), padding='same'))
         model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
