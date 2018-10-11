@@ -67,17 +67,16 @@ class lossPointPredict:
         model.add(Dropout(0.5))
         #model.add(MaxPooling2D(pool_size=(2, 2)))
 
-        '''
         model.add(Conv2D(64, (2, 2), padding='same', activation='relu'))
         model.add(Conv2D(64, (3, 3), padding='same', activation='relu', name='layer_64'))
-        model.add(Dropout(0.75))
-        '''
+        model.add(Dropout(0.5))
 
         model.add(Flatten())
-        model.add(Dense(128, activation='relu'))
+        model.add(Dense(1024, activation='relu'))
+        model.add(Dense(256, activation='relu'))
         model.add(Dense(14, activation='softmax'))
     
-        adam = Adam(lr=1e-07, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
+        adam = Adam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
         model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['acc'])
 
         model.summary()
