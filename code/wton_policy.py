@@ -32,12 +32,12 @@ nClasses = 4
 TRAININGDATA = '../xml_data/wton_training.dat'
 VALIDATIONDATA = '../xml_data/wton_validation.dat'
 WTON_PARAM_PATH = '../model/wether_waiting.model'
-CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.improvement_{epoch:02d}_{val_acc:.2f}.hdf5'
-T_CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.t_improvement_{epoch:02d}_{acc:.2f}.hdf5'
+CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.improvement_{epoch:02d}_{val_acc:.3f}.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.t_improvement_{epoch:02d}_{acc:.3f}.hdf5'
 
 class waitingOrNot:
     def __init__(self):
-        self.tensorboard = TensorBoard(log_dir = '../logs/waitingOrNot',
+        self.tensorboard = TensorBoard(log_dir = '../logs/waiting_or_not',
                                     histogram_freq = 0,
                                     write_graph = True,
                                     embeddings_freq = 0)
@@ -101,20 +101,21 @@ class waitingOrNot:
 def generate_data_from_file(path, batch_size):
     batch_x, batch_y = [], []
     count = 0
-    with open(path) as f:
-        for line in f:
-            gen = gs.data_gen_value(line)
-            for item in gen:
-                pass
-            x, y = dg.wton_data_gen(item)
-            batch_x.append(np.reshape(x, SHAPE))
-            batch_y.append(y)
-            count += 1
-            if count == batch_size:
-                yield np.array(batch_x), np.array(batch_y)
-                count = 0
-                batch_x = []
-                batch_y = []
+    while True:
+        with open(path) as f:
+            for line in f:
+                gen = gs.data_gen_value(line)
+                for item in gen:
+                    pass
+                x, y = dg.wton_data_gen(item)
+                batch_x.append(np.reshape(x, SHAPE))
+                batch_y.append(y)
+                count += 1
+                if count == batch_size:
+                    yield np.array(batch_x), np.array(batch_y)
+                    count = 0
+                    batch_x = []
+                    batch_y = []
 
 
  
