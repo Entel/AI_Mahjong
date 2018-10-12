@@ -32,8 +32,8 @@ TRAININGDATA = '../xml_data/wt_training.dat'
 VALIDATIONDATA = '../xml_data/wt_validation.dat'
 WTON_PARAM_PATH = '../model/wether_waiting.model'
 WT_PARAM_PATH = '../model/waiting_tile.model'
-CHECKPOINT_PATH = '../checkpoint/waiting_tiles/waiting_tiles.improvement_{epoch:02d}_{valcc:.2f}.hdf5'
-T_CHECKPOINT_PATH = '../checkpoint/waiting_tiles/waiting_tiles.t_improvement_{epoch:02d}_{valcc:.2f}.hdf5'
+CHECKPOINT_PATH = '../checkpoint/waiting_tiles/waiting_tiles.improvement_{epoch:02d}_{val_acc:.2f}.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/waiting_tiles/waiting_tiles.t_improvement_{epoch:02d}_{val_acc:.2f}.hdf5'
 
 class WaitingTilesPrediction:
     def __init__(self):

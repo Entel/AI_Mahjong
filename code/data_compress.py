@@ -19,6 +19,12 @@ def unzip_data(file_path, save_path):
         shutil.copyfileobj(f_in, f_out)
 
 if __name__ == '__main__':
+    '''
     for item in filelist:
         compress_data('../xml_data/'+ item + '.dat', '../compressed_data/' + item + '.gzip')
         print('Compressed: ' + item)
+    '''
+
+    for item in filelist:
+        unzip_data('../compressed_data/'+ item + '.gzip', '../xml_data/' + item + '.dat')
+        print('Unzip: ' + item)
