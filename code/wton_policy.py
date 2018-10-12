@@ -4,19 +4,21 @@ from game_simulation import GameSimulation as gs
 from training_data_value import DataGenerator as dg
 
 import keras
-from keras.models import Sequential
-from keras.layers import Conv2D
+import tensorflow as tf
+from keras.models import Sequential, load_model
+from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.callbacks import EarlyStopping, TensorBoard
+from keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
 from keras.initializers import glorot_uniform
 from keras.initializers import uniform
 from keras.optimizers import Adam
 from keras.utils import np_utils
+from keras.backend.tensorflow_backend import set_session
 
 config = tf.ConfigProto(
     gpu_options = tf.GPUOptions(
-        visible_device_list = '0',
-        allow_growth = True
+        per_process_gpu_memory_fraction=0.2,
+        visible_device_list = '1'
     )
 )
 set_session(tf.Session(config=config))
@@ -30,8 +32,8 @@ nClasses = 4
 TRAININGDATA = '../xml_data/wton_training.dat'
 VALIDATIONDATA = '../xml_data/wton_validation.dat'
 WTON_PARAM_PATH = '../model/wether_waiting.model'
-CHECKPOINT_PATH = '../checkpoint/loss_point/wton.best.hdf5'
-T_CHECKPOINT_PATH = '../checkpoint/loss_point/wton.training.best.hdf5'
+CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.improvement_{epoch:02d}_{val_acc:.2f}.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.t_improvement_{epoch:02d}_{acc:.2f}.hdf5'
 
 class waitingOrNot:
     def __init__(self):
@@ -59,20 +61,20 @@ class waitingOrNot:
 
         model.add(Conv2D(256, (2, 2), padding='same', activation='relu'))
         model.add(Conv2D(256, (3, 3), padding='same', activation='relu'))
-        model.add(Dropout(0.25))
+        model.add(Dropout(0.5))
 
         model.add(Conv2D(128, (2, 2), padding='same', activation='relu'))
         model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
-        model.add(Dropout(0.25))
+        model.add(Dropout(0.5))
 
         model.add(Flatten())
         model.add(Dense(1024, activation='relu'))
         model.add(Dense(512, activation='relu'))
         model.add(Dense(256, activation='relu'))
-        model.add(Dense(6))
+        model.add(Dense(3))
         model.add(Activation('softmax'))
     
-        adam = Adam(lr=10e-7)
+        adam = Adam(lr=10e-6)
         model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
 
         model.summary()
@@ -89,7 +91,7 @@ class waitingOrNot:
             validation_steps = 2437,
             class_weight = class_weight,
             use_multiprocessing = True,
-            workers = 16,
+            workers = 3,
             max_queue_size = 16,
             callbacks=[self.tensorboard, self.checkpoint, self.t_checkpoint])
 

@@ -17,15 +17,16 @@ from keras.backend.tensorflow_backend import set_session
 
 config = tf.ConfigProto(
     gpu_options = tf.GPUOptions(
-        visible_device_list = '0,1,2,3',
-        allow_growth = True
+        per_process_gpu_memory_fraction = 0.2,
+        visible_device_list = '2'
     )
 )
 set_session(tf.Session(config=config))
+#sess = tf.Session(config=tf.ConfigProto(log_device_placement=True))
 
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
-batch_size = 128
+batch_size = 32
 epochs = 1000
 
 TRAININGDATA = '../xml_data/wt_training.dat'
@@ -94,11 +95,11 @@ class WaitingTilesPrediction:
                 valid_y.append(y)
         
         model.fit_generator(generator = generate_data_from_file(TRAININGDATA, batch_size),
-            samples_per_epoch = 850,
+            samples_per_epoch = 3400,
             epochs = epochs,
             validation_data = (np.array(valid_x), np.array(valid_y)),
             use_multiprocessing = True,
-            workers = 4,
+            workers = 3,
             max_queue_size = 10,
             callbacks=[self.tensorboard, self.checkpoint, self.t_checkpoint])
 
@@ -108,20 +109,21 @@ class WaitingTilesPrediction:
 def generate_data_from_file(path, batch_size):
     batch_x, batch_y = [], []
     count = 0
-    with open(path) as f:
-        for line in f:
-            gen = gs.data_gen_value(line)
-            for item in gen:
-                pass
-            x, y = dg.wt_data_gen(item)
-            batch_x.append(np.reshape(x, SHAPE))
-            batch_y.append(y)
-            count += 1
-            if count == batch_size:
-                yield np.array(batch_x), np.array(batch_y)
-                count = 0
-                batch_x = []
-                batch_y = []
+    while True:
+        with open(path) as f:
+            for line in f:
+                gen = gs.data_gen_value(line)
+                for item in gen:
+                    pass
+                x, y = dg.wt_data_gen(item)
+                batch_x.append(np.reshape(x, SHAPE))
+                batch_y.append(y)
+                count += 1
+                if count == batch_size:
+                    yield np.array(batch_x), np.array(batch_y)
+                    count = 0
+                    batch_x = []
+                    batch_y = []
 
 
 if __name__ == '__main__':
