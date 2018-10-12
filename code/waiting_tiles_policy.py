@@ -25,7 +25,7 @@ set_session(tf.Session(config=config))
 
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
-batch_size = 32
+batch_size = 128
 epochs = 1000
 
 TRAININGDATA = '../xml_data/wt_training.dat'
@@ -94,11 +94,11 @@ class WaitingTilesPrediction:
                 valid_y.append(y)
         
         model.fit_generator(generator = generate_data_from_file(TRAININGDATA, batch_size),
-            samples_per_epoch = 3400,
+            samples_per_epoch = 850,
             epochs = epochs,
             validation_data = (np.array(valid_x), np.array(valid_y)),
             use_multiprocessing = True,
-            workers = 3,
+            workers = 4,
             max_queue_size = 10,
             callbacks=[self.tensorboard, self.checkpoint, self.t_checkpoint])
 
