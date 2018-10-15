@@ -27,7 +27,8 @@ set_session(tf.Session(config=config))
 
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
-batch_size = 32
+batch_size = 64
+SUB_DATA_SIZE = 5000
 epochs = 3000
 
 TRAININGDATA = '../xml_data/wt_training.dat'
@@ -95,20 +96,32 @@ class WaitingTilesPrediction:
                 x, y = dg.wt_data_gen(item)
                 valid_x.append(np.reshape(x, SHAPE))
                 valid_y.append(y)
-        
+        valid_data = (np.array(valid_x), np.array(valid_y))
+
+        '''
         model.fit_generator(generator = generate_data_from_file(TRAININGDATA, batch_size),
             steps_per_epoch = 3400,
             epochs = epochs,
             validation_data = (np.array(valid_x), np.array(valid_y)),
-            use_multiprocessing = True,
-            workers = 3,
-            max_queue_size = 10,
+            #use_multiprocessing = True,
+            #workers = 3,
+            #max_queue_size = 10,
             callbacks=[self.tensorboard, self.checkpoint, self.t_checkpoint])
+        '''
+        for e in range(epochs):
+            print('Epoch %d' % e)
+            for X, Y in generate_data_from_file():
+                model.fit(X, Y, 
+                    epochs = 1,  
+                    batch_size = batch_size, 
+                    validation_data = valid_data, 
+                    shuffle = True, 
+                    callbacks = [self.tensorboard, self.checkpoint, self.t_checkpoint])
 
         model.save(WT_PARAM_PATH)
         return model
              
-def generate_data_from_file(path, batch_size):
+def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
     batch_x, batch_y = [], []
     count = 0
     while True:
@@ -121,7 +134,7 @@ def generate_data_from_file(path, batch_size):
                 batch_x.append(np.reshape(x, SHAPE))
                 batch_y.append(y)
                 count += 1
-                if count == batch_size:
+                if count == sub_data_size:
                     yield np.array(batch_x), np.array(batch_y)
                     count = 0
                     batch_x = []
