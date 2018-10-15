@@ -95,7 +95,7 @@ class WaitingTilesPrediction:
                 valid_y.append(y)
         
         model.fit_generator(generator = generate_data_from_file(TRAININGDATA, batch_size),
-            samples_per_epoch = 3400,
+            steps_per_epoch = 3400,
             epochs = epochs,
             validation_data = (np.array(valid_x), np.array(valid_y)),
             use_multiprocessing = True,
