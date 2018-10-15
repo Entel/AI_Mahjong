@@ -8,6 +8,7 @@ import tensorflow as tf
 from keras.models import Sequential, load_model
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers.normalization import BatchNormalization
 from keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
 from keras.initializers import glorot_uniform
 from keras.initializers import uniform
@@ -27,7 +28,7 @@ set_session(tf.Session(config=config))
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
 batch_size = 32
-epochs = 1000
+epochs = 3000
 
 TRAININGDATA = '../xml_data/wt_training.dat'
 VALIDATIONDATA = '../xml_data/wt_validation.dat'
@@ -57,6 +58,7 @@ class WaitingTilesPrediction:
         model = Sequential()
         
         model.add(Conv2D(512, (2, 2), padding='same', activation='relu', input_shape=input_shape))
+        model.add(BatchNormalization())
         model.add(Conv2D(512, (3, 3), padding='same'))
         model.add(Conv2D(512, (4, 4), padding='same', activation='relu'))
         model.add(Dropout(0.25))

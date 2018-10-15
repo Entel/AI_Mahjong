@@ -8,6 +8,7 @@ import tensorflow as tf
 from keras.models import Sequential, load_model
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers.normalization import BatchNormalization
 from keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
 from keras.initializers import glorot_uniform
 from keras.initializers import uniform
@@ -56,6 +57,7 @@ class waitingOrNot:
         model = Sequential()
         
         model.add(Conv2D(512, (2, 2), padding='same', activation='relu', input_shape=input_shape))
+        model.add(BatchNormalization())
         model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
         model.add(Dropout(0.25))
 
