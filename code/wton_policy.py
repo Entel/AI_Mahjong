@@ -84,14 +84,12 @@ class waitingOrNot:
 
     def training(self):
         model = self.create_model()
-        class_weight = {0: 77113, 1: 80232, 2: 85610}
 
         model.fit_generator(generator = generate_data_from_file(TRAININGDATA, batch_size),
             steps_per_epoch = 7500,
             epochs = epochs,
             validation_data = generate_data_from_file(VALIDATIONDATA, batch_size),
             validation_steps = 2437,
-            class_weight = class_weight,
             use_multiprocessing = True,
             workers = 3,
             max_queue_size = 16,
