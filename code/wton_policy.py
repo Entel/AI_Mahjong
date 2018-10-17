@@ -26,8 +26,9 @@ set_session(tf.Session(config=config))
 
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
-batch_size = 32
-epochs = 1000
+batch_size = 64
+epochs = 3000
+SUB_DATA_SIZE = 5000
 nClasses = 4
 
 TRAININGDATA = '../xml_data/wton_training.dat'
@@ -85,6 +86,19 @@ class waitingOrNot:
     def training(self):
         model = self.create_model()
 
+        with open(VALIDATIONDATA) as f:
+            valid_x, valid_y = [], []
+            lines = f.readlines()
+            for line in lines:
+                gen = gs.data_gen_value(line)
+                for item in gen:
+                    pass
+                x, y = dg.wt_data_gen(item)
+                valid_x.append(np.reshape(x, SHAPE))
+                valid_y.append(y)
+        valid_data = (np.array(valid_x), np.array(valid_y))
+
+        '''
         model.fit_generator(generator = generate_data_from_file(TRAININGDATA, batch_size),
             steps_per_epoch = 7500,
             epochs = epochs,
@@ -94,29 +108,39 @@ class waitingOrNot:
             workers = 3,
             max_queue_size = 16,
             callbacks=[self.tensorboard, self.checkpoint, self.t_checkpoint])
+        '''
+        for e in range(epochs):
+            print('Epoch %d' % e)
+            for X, Y in generate_data_from_file():
+                model.fit(X, Y, 
+                    epochs = 1,  
+                    batch_size = batch_size, 
+                    validation_data = valid_data, 
+                    shuffle = True, 
+                    callbacks = [self.tensorboard, self.checkpoint, self.t_checkpoint])
 
         model.save(WTON_PARAM_PATH)
         return model
 
-def generate_data_from_file(path, batch_size):
+def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
     batch_x, batch_y = [], []
     count = 0
-    while True:
-        with open(path) as f:
-            for line in f:
-                gen = gs.data_gen_value(line)
-                for item in gen:
-                    pass
-                x, y = dg.wton_data_gen(item)
-                batch_x.append(np.reshape(x, SHAPE))
-                batch_y.append(y)
-                count += 1
-                if count == batch_size:
-                    yield np.array(batch_x), np.array(batch_y)
-                    count = 0
-                    batch_x = []
-                    batch_y = []
-
+    #while True:
+    with open(path) as f:
+        for line in f:
+            gen = gs.data_gen_value(line)
+            item = gen[-1]
+            x, y = dg.wton_data_gen(item)
+            batch_x.append(np.reshape(x, SHAPE))
+            batch_y.append(y)
+            count += 1
+            if count == SUB_DATA_SIZE:
+                yield np.array(batch_x), np.array(batch_y)
+                count = 0
+                batch_x = []
+                batch_y = []
+        else:
+            yield np.array(batch_x), np.array(batch_y)
 
  
 if __name__ == '__main__':

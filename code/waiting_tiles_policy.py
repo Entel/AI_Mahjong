@@ -124,34 +124,31 @@ class WaitingTilesPrediction:
 def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
     batch_x, batch_y = [], []
     count = 0
-    while True:
-        with open(path) as f:
-            for line in f:
-                gen = gs.data_gen_value(line)
-                for item in gen:
-                    pass
-                x, y = dg.wt_data_gen(item)
-                batch_x.append(np.reshape(x, SHAPE))
-                batch_y.append(y)
-                count += 1
-                if count == sub_data_size:
-                    yield np.array(batch_x), np.array(batch_y)
-                    count = 0
-                    batch_x = []
-                    batch_y = []
+    #while True:
+    with open(path) as f:
+        for line in f:
+            print line
+            gen_li = gs.data_gen(line)
+            item = gen_li[-1]
+            print item
+            x, y = dg.wt_data_gen(item)
+            batch_x.append(np.reshape(x, SHAPE))
+            batch_y.append(y)
+            count += 1
+            if count == sub_data_size:
+                yield np.array(batch_x), np.array(batch_y)
+                count = 0
+                batch_x = []
+                batch_y = []
+        else:
+            yield np.array(batch_x), np.array(batch_y)
 
 
 if __name__ == '__main__':
-    '''
-    with open('../test.dat') as f:
-        for line in f:
-            gen = gs.data_gen(line)
-            for item in gen:
-                waiting, x, wt, y = generate_data_for_waiting(item)
-                if waiting:
-                    print np.array(x).shape, wt, y
-            break
-    print np.reshape(x, SHAPE)[0]
+    for x, y in generate_data_from_file('../xml_data/fz_test.dat', 3):
+        print y
+            
     '''
     wtp = WaitingTilesPrediction()
     model = wtp.training()
+    '''

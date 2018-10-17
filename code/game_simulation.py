@@ -2,6 +2,7 @@ import csv
 import os
 import re
 import numpy as np
+import copy
 import xml.etree.ElementTree as ET
 from mahjong.shanten import Shanten
 from mahjong.tile import TilesConverter
@@ -261,6 +262,90 @@ class GameSimulation:
                     who_reach.append(_who_reach)
 
     @staticmethod
+    def data_gen(game_tree):
+        '''
+            data for value network
+            if there's a reach, generate data from reach to agari
+            otherwish, generate data for the final siatus
+        '''
+        root = GameSimulation.init_data(game_tree)
+        mentsu = []
+        kawa = []
+        point = []
+        nagare = []
+        agari_tag = []
+        who_reach = []
+        for child in root:
+            if child.tag == 'INIT':
+                init_tag = child #element
+            elif child.tag == 'AGARI':
+                agari_tag.append(child) #element
+            else:
+                nagare.append(ET.tostring(child)) #string
+        hai = GameSimulation.init_hai(init_tag)
+        oya = GameSimulation.init_oya(init_tag)
+        final_point = GameSimulation.point_change(agari_tag)
+        hands = hai
+        dorahai = []
+        dorahai.append(GameSimulation.num2tiles(GameSimulation.dorahai(init_tag)))
+        who, from_who, machi = GameSimulation.get_winer(agari_tag)
+        
+        for i in range(4):
+            kawa.append([])
+            mentsu.append([])
+        generated = []
+
+        for ngr in nagare:
+            tiles = ET.fromstring(ngr)
+            if tiles.tag != 'N' and tiles.tag != 'REACH' and tiles.tag != 'DORA':
+                _who = tiles.tag[0]
+                tile = int(tiles.tag[1:])
+                #who get what tile
+                if _who == 'T':
+                    hands[0].append(tile)
+                elif _who == 'U':
+                    hands[1].append(tile)
+                elif _who == 'V':
+                    hands[2].append(tile)
+                elif _who == 'W':
+                    hands[3].append(tile)
+                #who discard what tile
+                elif _who == 'D':
+                    generated.append(copy.deepcopy([tiles.tag, list(hands), list(mentsu), list(kawa), list(dorahai), oya, list(who_reach), list(final_point), list(who), list(from_who), machi]))
+                    hands[0].remove(tile)
+                    kawa[0].append(tile)
+                elif _who == 'E':
+                    generated.append(copy.deepcopy([tiles.tag, list(hands), list(mentsu), list(kawa), list(dorahai), oya, list(who_reach), list(final_point), list(who), list(from_who), machi]))
+                    hands[1].remove(tile)
+                    kawa[1].append(tile)
+                elif _who == 'F':
+                    generated.append(copy.deepcopy([tiles.tag, list(hands), list(mentsu), list(kawa), list(dorahai), oya, list(who_reach), list(final_point), list(who), list(from_who), machi]))
+                    hands[2].remove(tile)
+                    kawa[2].append(tile)
+                elif _who == 'G':
+                    generated.append(copy.deepcopy([tiles.tag, list(hands), list(mentsu), list(kawa), list(dorahai), oya, list(who_reach), list(final_point), list(who), list(from_who), machi]))
+                    hands[3].remove(tile)
+                    kawa[3].append(tile)
+                    
+            elif tiles.tag == 'N':
+                _who = tiles.get('who')
+                m = tiles.get('m')
+                r, h = GameSimulation.m_process(m)
+                mentsu[int(_who)].append(h)
+                for i in h:
+                    if i in hands[int(_who)]:
+                        hands[int(_who)].remove(i)
+            
+            elif tiles.tag == 'DORA':
+                dorahai.append(GameSimulation.num2tiles(int(tiles.get('hai'))))
+
+            elif tiles.tag == 'REACH':
+                if tiles.get('step') == '2':
+                    _who_reach = int(tiles.get('who'))
+                    who_reach.append(_who_reach)
+        return generated
+
+    @staticmethod
     def concatenate_hands_and_mentsu(hands, mentsu):
         for i in range(0, 4):
             if mentsu[i] != []:
@@ -392,10 +477,14 @@ if __name__ == '__main__':
     print GameSimulation.concatenate_hands_and_mentsu(hands, mentsu)
     print hands 
     
-    with open('../xml_data/shuf_test.dat', 'r+') as f:
-        tests = f.readlines()
+    '''
+    with open('../xml_data/fz_test.dat', 'r+') as f:
+        tests = f.readline()
+    for item in GameSimulation.data_gen(tests):
+        print(item)
+    '''
     for test in tests:
-        gen = GameSimulation.data_gen_policy(test)
+       gen = GameSimulation.data_gen_policy(test)
     
         for item in gen:
             pass

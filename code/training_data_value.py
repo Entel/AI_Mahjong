@@ -274,7 +274,7 @@ class DataGenerator:
 
     @staticmethod
     def lp_data_gen(_data):
-        DataGenerator.return_to_last_turn(_data)
+        #DataGenerator.return_to_last_turn(_data)
         mesen_data = DataGenerator.mesen_transfer(_data)
         mesen_data = DataGenerator.data2tiles(mesen_data)
         return DataGenerator.lp_x_gen(mesen_data), DataGenerator.lp_y_gen(mesen_data)
@@ -355,7 +355,7 @@ class DataGenerator:
 
     @staticmethod
     def wt_data_gen(_data):
-        DataGenerator.return_to_last_turn(_data)
+        #DataGenerator.return_to_last_turn(_data)
         mesen_data = DataGenerator.mesen_transfer(_data)
         mesen_data = DataGenerator.data2tiles(mesen_data)
         return DataGenerator.wt_x_gen(mesen_data), DataGenerator.wt_y_gen(mesen_data)
@@ -378,7 +378,7 @@ class DataGenerator:
         return _wton[1:]
         
     def wton_data_gen(_data):
-        DataGenerator.return_to_last_turn(_data)
+        #DataGenerator.return_to_last_turn(_data)
         mesen_data = DataGenerator.mesen_transfer(_data)
         mesen_data = DataGenerator.data2tiles(mesen_data)
         return DataGenerator.wt_x_gen(mesen_data), DataGenerator.wton_y_gen(mesen_data)
