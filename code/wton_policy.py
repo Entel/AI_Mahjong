@@ -86,6 +86,7 @@ class waitingOrNot:
     def training(self):
         model = self.create_model()
 
+        '''
         with open(VALIDATIONDATA) as f:
             valid_x, valid_y = [], []
             lines = f.readlines()
@@ -96,7 +97,6 @@ class waitingOrNot:
                 valid_y.append(y)
         valid_data = (np.array(valid_x), np.array(valid_y))
 
-        '''
         model.fit_generator(generator = generate_data_from_file(TRAININGDATA, batch_size),
             steps_per_epoch = 7500,
             epochs = epochs,
@@ -109,11 +109,13 @@ class waitingOrNot:
         '''
         for e in range(epochs):
             print('Epoch %d' % e)
+            os.system('shuf ' + TRAININGDATA + ' -o ' + TRAININGDATA)
             for X, Y in generate_data_from_file():
                 model.fit(X, Y, 
                     epochs = 1,  
                     batch_size = batch_size, 
-                    validation_data = valid_data, 
+                    #validation_data = valid_data, 
+                    validation_split = 0.2,
                     shuffle = True, 
                     callbacks = [self.tensorboard, self.checkpoint, self.t_checkpoint])
 
