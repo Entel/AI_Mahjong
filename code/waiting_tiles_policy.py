@@ -28,7 +28,7 @@ set_session(tf.Session(config=config))
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
 batch_size = 64
-SUB_DATA_SIZE = 5000
+SUB_DATA_SIZE = 20000
 epochs = 3000
 
 TRAININGDATA = '../xml_data/wt_training.dat'
@@ -127,10 +127,8 @@ def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
     #while True:
     with open(path) as f:
         for line in f:
-            print line
             gen_li = gs.data_gen(line)
             item = gen_li[-1]
-            print item
             x, y = dg.wt_data_gen(item)
             batch_x.append(np.reshape(x, SHAPE))
             batch_y.append(y)
@@ -145,10 +143,10 @@ def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
 
 
 if __name__ == '__main__':
+    '''
     for x, y in generate_data_from_file('../xml_data/fz_test.dat', 3):
         print y
             
     '''
     wtp = WaitingTilesPrediction()
     model = wtp.training()
-    '''

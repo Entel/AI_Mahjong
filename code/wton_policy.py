@@ -28,7 +28,7 @@ input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
 batch_size = 64
 epochs = 3000
-SUB_DATA_SIZE = 5000
+SUB_DATA_SIZE = 20000
 nClasses = 4
 
 TRAININGDATA = '../xml_data/wton_training.dat'
@@ -90,10 +90,8 @@ class waitingOrNot:
             valid_x, valid_y = [], []
             lines = f.readlines()
             for line in lines:
-                gen = gs.data_gen_value(line)
-                for item in gen:
-                    pass
-                x, y = dg.wt_data_gen(item)
+                gen = gs.data_gen(line)
+                x, y = dg.wton_data_gen(gen[-1])
                 valid_x.append(np.reshape(x, SHAPE))
                 valid_y.append(y)
         valid_data = (np.array(valid_x), np.array(valid_y))
@@ -128,7 +126,7 @@ def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
     #while True:
     with open(path) as f:
         for line in f:
-            gen = gs.data_gen_value(line)
+            gen = gs.data_gen(line)
             item = gen[-1]
             x, y = dg.wton_data_gen(item)
             batch_x.append(np.reshape(x, SHAPE))
