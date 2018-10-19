@@ -81,22 +81,6 @@ class ResultStatistics():
                         st[ResultStatistics.ten_range(agari)] += 1
         return st
                 
-    @staticmethod
-    def waiting_tile(agari_tag):
-        machi = int(agari_tag.get('machi'))
-        tile = ResultStatistics.num2tiles(machi)
-        return int(tile)
-
-    @staticmethod
-    def wt_add_up(datapath):
-        st = [0 for i in range(34)]
-        with open(datapath, 'r') as f:
-            for line in f:
-                root = ResultStatistics.init_data(line)
-                zimo, agaris, who = ResultStatistics.agari_tag(root)
-                for agari in agaris:
-                    st[ResultStatistics.waiting_tile(agari)] += 1
-        return st
 
     @staticmethod
     def num2tiles(num):
@@ -126,6 +110,23 @@ class ResultStatistics():
                                 rf.write(line)
                             st[ten_index] -= 1
 
+        return st
+
+    @staticmethod
+    def waiting_tile(agari_tag):
+        machi = int(agari_tag.get('machi'))
+        tile = ResultStatistics.num2tiles(machi)
+        return int(tile)
+
+    @staticmethod
+    def wt_add_up(datapath):
+        st = [0 for i in range(34)]
+        with open(datapath, 'r') as f:
+            for line in f:
+                root = ResultStatistics.init_data(line)
+                zimo, agaris, who = ResultStatistics.agari_tag(root)
+                for agari in agaris:
+                    st[ResultStatistics.waiting_tile(agari)] += 1
         return st
 
     @staticmethod
