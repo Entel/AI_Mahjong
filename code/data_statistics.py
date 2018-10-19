@@ -1,4 +1,5 @@
 import numpy as np
+import csv
 import xml.etree.ElementTree as ET
 from game_simulation import GameSimulation as gs
 
@@ -17,6 +18,8 @@ WT_TRAINING = '../xml_data/wt_training.dat'
 WT_VALIDATION = '../xml_data/wt_validation.dat'
 HOZYU_TRAINING = '../xml_data/wton_training.dat'
 HOZYU_VALIDATION = '../xml_data/wton_validation.dat'
+TMP_FILE = '../data/tmp.dat'
+DISCARD_DATA = '../data/discard.dat'
 
 TEN_MATRIX = [1, 2, 3, 4, 5, 6, 8, 12, 18]
 
@@ -188,6 +191,104 @@ class ResultStatistics():
                         st[(_who + 1) % 4] += 1
         return st
 
+    @staticmethod
+    def list_to_str(li):
+        li[0] = str(li[0])
+
+        for i in range(len(li[1])):
+            item = ','.join(str(e) for e in li[1][i])
+            li[1][i] = item
+        li[1] = '|'.join(li[1])
+
+        for i in range(len(li[2])):
+            if not li[2][i]:
+                li[2][i] = '999'
+            else:
+                _item = []
+                for j in range(len(li[2][i])):
+                    if j != 0:
+                        li[2][i][0] += li[2][i][j]
+                li[2][i] = li[2][i][0]
+                li[2][i] = ','.join(str(e) for e in li[2][i])
+        li[2] = '|'.join(li[2])
+
+        for i in range(len(li[3])):
+            if not li[3][i]:
+                li[3][i] = '999'
+            else:
+                item = ','.join(str(e) for e in li[3][i])
+                li[3][i] = item
+        li[3] = '|'.join(li[3])
+
+        li[4] = ','.join(str(e) for e in li[4])
+        li[5] = str(li[5])
+        li[6] = ','.join(str(e) for e in li[6])
+        li[7] = ','.join(str(e) for e in li[7])
+        li[8] = ','.join(str(e) for e in li[8])
+        li[9] = ','.join(str(e) for e in li[9])
+        li[10] = str(li[10])
+        return '||'.join(li)
+
+    @staticmethod
+    def discard_add_up(datapath):
+        st = [0 for i in range(34)]
+        with open(datapath) as f:
+            for line in f:
+                try:
+                    game = gs.data_gen(line)
+                    who = game[0][8][0]
+                    if who == 0:
+                        for item in game:
+                            if item[0][0] == 'D':
+                                tile = item[0][1:]
+                                #write a line into tmp file
+                                with open(TMP_FILE, 'a') as tff:
+                                    status_str = ResultStatistics.list_to_str(item)
+                                    tff.write(status_str)
+                                st[ResultStatistics.num2tiles(tile)] += 1
+                    elif who == 1:
+                        for item in game:
+                            if item[0][0] == 'E':
+                                tile = item[0][1:]
+                                #write a line into tmp file
+                                with open(TMP_FILE, 'a') as tff:
+                                    status_str = ResultStatistics.list_to_str(item)
+                                    tff.write(status_str)
+                                st[ResultStatistics.num2tiles(tile)] += 1
+                    elif who == 2:
+                        for item in game:
+                            if item[0][0] == 'F':
+                                tile = item[0][1:]
+                                #write a line into tmp file
+                                with open(TMP_FILE, 'a') as tff:
+                                    status_str = ResultStatistics.list_to_str(item)
+                                    tff.write(status_str)
+                                st[ResultStatistics.num2tiles(tile)] += 1
+                    elif who == 3:
+                        for item in game:
+                            if item[0][0] == 'G':
+                                tile = item[0][1:]
+                                #write a line into tmp file
+                                with open(TMP_FILE, 'a') as tff:
+                                    status_str = ResultStatistics.list_to_str(item)
+                                    tff.write(status_str)
+                                st[ResultStatistics.num2tiles(tile)] += 1
+                except:
+                    continue
+        return st
+
+    @staticmethod
+    def discard_collect(datapath, savepath):
+        st = [20000 for i in range(34)]
+        with open(TMP_FILE) as f:
+            with open(DISCARD_DATA, 'a+') as df:
+                for line in f:
+                    tile = ResultStatistics.num2tiles(line[0][1:])
+                    if st[tile] != 0:
+                        df.write(line)
+                        st[tile] -= 1
+        return st
+
 if __name__ == '__main__':
     #print(ResultStatistics.lp_collect_data())
     #print(ResultStatistics.lp_add_up(HOZYU_DATA))
@@ -195,11 +296,13 @@ if __name__ == '__main__':
     #print ResultStatistics.machi_add_up('../xml_data/shuf_xml_record.dat')
     #print ResultStatistics.wt_collect_data()
     #print(ResultStatistics.wt_add_up(HOZYU_DATA))
-    ResultStatistics.file_division(4000*9, LP_XML_DATA, LP_TRAINING, LP_VALIDATION)
-    print(ResultStatistics.lp_add_up(LP_TRAINING))
-    print(ResultStatistics.lp_add_up(LP_VALIDATION))
+    #ResultStatistics.file_division(4000*9, LP_XML_DATA, LP_TRAINING, LP_VALIDATION)
+    #print(ResultStatistics.lp_add_up(LP_TRAINING))
+    #print(ResultStatistics.lp_add_up(LP_VALIDATION))
     #print(ResultStatistics.wton_add_up(HOZYU_DATA))
     #ResultStatistics.agari_type_classification()
     #ResultStatistics.file_division(80000*3, HOZYU_DATA, HOZYU_TRAINING, HOZYU_VALIDATION)
     #print(ResultStatistics.wton_add_up(HOZYU_TRAINING))
     #print(ResultStatistics.wton_add_up(HOZYU_VALIDATION))
+
+    print(ResultStatistics.discard_add_up(XML_DATA))

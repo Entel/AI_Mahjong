@@ -330,11 +330,20 @@ class GameSimulation:
             elif tiles.tag == 'N':
                 _who = tiles.get('who')
                 m = tiles.get('m')
-                r, h = GameSimulation.m_process(m)
-                mentsu[int(_who)].append(h)
-                for i in h:
-                    if i in hands[int(_who)]:
-                        hands[int(_who)].remove(i)
+                chakan, h = GameSimulation.m_process(m)
+                if not chakan:
+                    mentsu[int(_who)].append(h)
+                    for i in h:
+                        if i in hands[int(_who)]:
+                            hands[int(_who)].remove(i)
+                else:
+                    for i in h:
+                        if i in hands[int(_who)]:
+                            hands[int(_who)].remove(i)
+                    for item in mentsu[int(_who)]:
+                        if GameSimulation.sublist(item, h):
+                            mentsu[int(_who)].remove(item)
+                            mentsu[int(_who)].append(h)
             
             elif tiles.tag == 'DORA':
                 dorahai.append(GameSimulation.num2tiles(int(tiles.get('hai'))))
@@ -344,6 +353,15 @@ class GameSimulation:
                     _who_reach = int(tiles.get('who'))
                     who_reach.append(_who_reach)
         return generated
+
+    @staticmethod
+    def sublist(list1, list2):
+        '''
+        caculate weather list1 is a sublist of list2
+        '''
+        li1 = [e for e in list1 if e in list2]
+        #li2 = [e for e in list2 if e in li1]
+        return li1 == list1
 
     @staticmethod
     def concatenate_hands_and_mentsu(hands, mentsu):
@@ -414,6 +432,7 @@ class GameSimulation:
         kui = (m & 3)
         r = 0
         t = 0
+        chakan = False
         h = []
         if (m & (1 << 2)): #SYUNTSU
             t = (m & 0xFC00) >> 10
@@ -456,6 +475,7 @@ class GameSimulation:
             t //= 3
             t *= 4
             h = [t, t+1, t+2, t+3]
+            chakan = True
             
         else:#MINKAN, ANKAN
             hai0 = (m & 0xFF00) >> 8
@@ -464,7 +484,7 @@ class GameSimulation:
             t = (hai0 // 4) * 4
             h = [t, t+1, t+2, t+3]
             
-        return r, h
+        return chakan, h
             
 if __name__ == '__main__':
     '''
@@ -478,11 +498,15 @@ if __name__ == '__main__':
     print hands 
     
     '''
-    with open('../xml_data/fz_test.dat', 'r+') as f:
-        tests = f.readline()
-    for item in GameSimulation.data_gen(tests):
-        print(item)
     '''
+    with open('../xml_data/fz_test.dat', 'r+') as f:
+        tests = f.readlines()
+    for test in tests:
+        for item in GameSimulation.data_gen(test):
+            print(item)
+
+    print GameSimulation.sublist([1, 2], [1,2,3])
+    print GameSimulation.sublist([1, 4], [1,2,3])
     for test in tests:
        gen = GameSimulation.data_gen_policy(test)
     
