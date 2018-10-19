@@ -20,6 +20,8 @@ HOZYU_TRAINING = '../xml_data/wton_training.dat'
 HOZYU_VALIDATION = '../xml_data/wton_validation.dat'
 TMP_FILE = '../data/tmp.dat'
 DISCARD_DATA = '../data/discard.dat'
+DISCARD_TRAINING = '../data/discard_training.dat'
+DISCARD_VALIDATION = '../data/discard_validation.dat'
 
 TEN_MATRIX = [1, 2, 3, 4, 5, 6, 8, 12, 18]
 
@@ -223,7 +225,10 @@ class ResultStatistics():
 
         li[4] = ','.join(str(e) for e in li[4])
         li[5] = str(li[5])
-        li[6] = ','.join(str(e) for e in li[6])
+        if not li[6]:
+            li[6] = '999'
+        else:
+            li[6] = ','.join(str(e) for e in li[6])
         li[7] = ','.join(str(e) for e in li[7])
         li[8] = ','.join(str(e) for e in li[8])
         li[9] = ','.join(str(e) for e in li[9])
@@ -244,7 +249,7 @@ class ResultStatistics():
                                 tile = item[0][1:]
                                 #write a line into tmp file
                                 with open(TMP_FILE, 'a') as tff:
-                                    status_str = ResultStatistics.list_to_str(item)
+                                    status_str = ResultStatistics.list_to_str(item) + '\n'
                                     tff.write(status_str)
                                 st[ResultStatistics.num2tiles(tile)] += 1
                     elif who == 1:
@@ -253,7 +258,7 @@ class ResultStatistics():
                                 tile = item[0][1:]
                                 #write a line into tmp file
                                 with open(TMP_FILE, 'a') as tff:
-                                    status_str = ResultStatistics.list_to_str(item)
+                                    status_str = ResultStatistics.list_to_str(item) + '\n'
                                     tff.write(status_str)
                                 st[ResultStatistics.num2tiles(tile)] += 1
                     elif who == 2:
@@ -262,7 +267,7 @@ class ResultStatistics():
                                 tile = item[0][1:]
                                 #write a line into tmp file
                                 with open(TMP_FILE, 'a') as tff:
-                                    status_str = ResultStatistics.list_to_str(item)
+                                    status_str = ResultStatistics.list_to_str(item) + '\n'
                                     tff.write(status_str)
                                 st[ResultStatistics.num2tiles(tile)] += 1
                     elif who == 3:
@@ -271,7 +276,7 @@ class ResultStatistics():
                                 tile = item[0][1:]
                                 #write a line into tmp file
                                 with open(TMP_FILE, 'a') as tff:
-                                    status_str = ResultStatistics.list_to_str(item)
+                                    status_str = ResultStatistics.list_to_str(item) + '\n'
                                     tff.write(status_str)
                                 st[ResultStatistics.num2tiles(tile)] += 1
                 except:
@@ -280,11 +285,12 @@ class ResultStatistics():
 
     @staticmethod
     def discard_collect(datapath, savepath):
-        st = [20000 for i in range(34)]
+        st = [100000 for i in range(34)]
         with open(TMP_FILE) as f:
             with open(DISCARD_DATA, 'a+') as df:
                 for line in f:
-                    tile = ResultStatistics.num2tiles(line[0][1:])
+                    li = line.split('||') 
+                    tile = ResultStatistics.num2tiles(li[0][1:])
                     if st[tile] != 0:
                         df.write(line)
                         st[tile] -= 1
@@ -306,4 +312,6 @@ if __name__ == '__main__':
     #print(ResultStatistics.wton_add_up(HOZYU_TRAINING))
     #print(ResultStatistics.wton_add_up(HOZYU_VALIDATION))
 
-    print(ResultStatistics.discard_add_up(XML_DATA))
+    #print(ResultStatistics.discard_add_up(XML_DATA))
+    #print(ResultStatistics.discard_collect(TMP_FILE, DISCARD_DATA))
+    ResultStatistics.file_division(99000*34, DISCARD_DATA, DISCARD_TRAINING, DISCARD_VALIDATION)
