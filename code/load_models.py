@@ -1,9 +1,10 @@
 from game_simulation import GameSimulation as gs
 from training_data_value import DataGenerator as dg
-from loss_point_nn import lossPointPredict as lpp
+#from loss_point_nn import lossPointPredict as lpp
 from waiting_tiles_nn import WaitingTilesPrediction as wtp 
 
 import numpy as np
+import tensorflow as tf
 import keras
 from keras.models import Sequential, load_model
 from keras.layers import Conv2D
@@ -13,6 +14,7 @@ from keras.initializers import glorot_uniform
 from keras.initializers import uniform
 from keras.optimizers import Adam
 from keras.utils import np_utils
+from keras.backend.tensorflow_backend import set_session
 
 SHAPE_108 = [6, 6, 108] 
 SHAPE_107 = [6, 6, 107] 
@@ -23,6 +25,13 @@ ZIMO_DATA = '../xml_data/zimo.dat'
 WT_MODEL = '../model/waiting_tile.model'
 WT_VAL = '../xml_data/wt_validation.dat'
 
+config = tf.ConfigProto(
+    gpu_options = tf.GPUOptions(
+        per_process_gpu_memory_fraction = 0.2,
+        visible_device_list = '2'
+    )
+)
+set_session(tf.Session(config=config))
 
 def data_generator_for_testing(datapath, shape):
     batch_x, batch_y = [], []
@@ -30,7 +39,7 @@ def data_generator_for_testing(datapath, shape):
     with open(datapath) as f:
         for line in f:
             gen = gs.data_gen_value(line)
-            item = gen_li[-1]
+            item = gen[-1]
             x, y = dg.lp_data_gen(item)
             batch_x.append(np.reshape(x, shape))
             batch_y.append(y)
@@ -45,8 +54,8 @@ def data_generator_for_testing(datapath, shape):
 class Prediction:
     def __init__(self):
         #self.lp_model = load_model(LOSS_POINT_MODEL)
-        self.lp = lpp()
-        self.lp_model = self.lp.create_model()
+        #self.lp = lpp()
+        #self.lp_model = self.lp.create_model()
 
         self.wt = wtp()
         self.wt_model = self.wt.create_model()
@@ -58,6 +67,7 @@ class Prediction:
     def waiting_tiles_evaluate(self, datapath):
         return self.wt_model.evaluate_generator(data_generator_for_testing(datapath, SHAPE_107), steps=1000)
 
+    '''
     def loss_point_pred(self, x):
         self.lp_model.load_weights('../checkpoint/loss_point/weights_without_zimo.best.hdf5')
         return self.lp_model.predict(np.reshape(x, [1, 6, 6, 108]))
@@ -65,6 +75,7 @@ class Prediction:
     def loss_point_evaluate(self):
         self.lp_model.load_weights(LOSS_POINT_MODEL)
         return self.lp_model.evaluate_generator(zimo_data_generator(ZIMO_DATA), steps=1000)
+    '''
 
 if __name__ == '__main__':
     pred = Prediction()

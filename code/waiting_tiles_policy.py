@@ -29,7 +29,7 @@ input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
 batch_size = 64
 SUB_DATA_SIZE = 20000
-epochs = 3000
+epochs = 150
 
 TRAININGDATA = '../xml_data/wt_training.dat'
 VALIDATIONDATA = '../xml_data/wt_validation.dat'

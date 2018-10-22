@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from itertools import islice
 from game_simulation import GameSimulation as gs
 from training_data_value import DataGenerator as dg
@@ -27,15 +28,15 @@ set_session(tf.Session(config=config))
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
 batch_size = 64
-epochs = 3000
+epochs = 150
 SUB_DATA_SIZE = 20000
 nClasses = 4
 
 TRAININGDATA = '../xml_data/wton_training.dat'
 VALIDATIONDATA = '../xml_data/wton_validation.dat'
 WTON_PARAM_PATH = '../model/wether_waiting.model'
-CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.improvement_{epoch:02d}_{val_acc:.3f}.hdf5'
-T_CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.t_improvement_{epoch:02d}_{acc:.3f}.hdf5'
+CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.improvement_{val_acc:.3f}.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.t_improvement_{acc:.3f}.hdf5'
 
 class waitingOrNot:
     def __init__(self):
@@ -48,7 +49,7 @@ class waitingOrNot:
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='auto')
-        self.t_checkpoint = ModelCheckpoint(CHECKPOINT_PATH, 
+        self.t_checkpoint = ModelCheckpoint(T_CHECKPOINT_PATH, 
                                     monitor='acc', 
                                     verbose=1, 
                                     save_best_only=True, 
@@ -139,8 +140,8 @@ def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
                 count = 0
                 batch_x = []
                 batch_y = []
-        else:
-            yield np.array(batch_x), np.array(batch_y)
+        #else:
+        #    yield np.array(batch_x), np.array(batch_y)
 
  
 if __name__ == '__main__':
