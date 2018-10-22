@@ -1,6 +1,6 @@
 from game_simulation import GameSimulation as gs
 from training_data_value import DataGenerator as dg
-from loss_point import lossPointPredict as lpp
+from loss_point_nn import lossPointPredict as lpp
 from waiting_tiles_nn import WaitingTilesPrediction as wtp 
 
 import numpy as np
@@ -14,13 +14,14 @@ from keras.initializers import uniform
 from keras.optimizers import Adam
 from keras.utils import np_utils
 
-TEN_MATRIX = [1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 16, 18, 24]
-108_SHAPE = [6, 6, 108] 
-107_SHAPE = [6, 6, 107] 
+SHAPE_108 = [6, 6, 108] 
+SHAPE_107 = [6, 6, 107] 
 
 
 LOSS_POINT_MODEL = '../checkpoint/loss_point/weights_training.best.hdf5'
 ZIMO_DATA = '../xml_data/zimo.dat'
+WT_MODEL = '../model/waiting_tile.model'
+WT_VAL = '../xml_data/wt_validation.dat'
 
 
 def data_generator_for_testing(datapath, shape):
@@ -29,8 +30,7 @@ def data_generator_for_testing(datapath, shape):
     with open(datapath) as f:
         for line in f:
             gen = gs.data_gen_value(line)
-            for item in gen:
-                pass
+            item = gen_li[-1]
             x, y = dg.lp_data_gen(item)
             batch_x.append(np.reshape(x, shape))
             batch_y.append(y)
@@ -56,7 +56,7 @@ class Prediction:
         return self.wt_model.predict(np.reshape(x, [1, 6, 6, 107]))
 
     def waiting_tiles_evaluate(self, datapath):
-        return self.wt_model.evaluate_generator(data_generator_for_testing(datapath, 107_SHAPE), steps=1000)
+        return self.wt_model.evaluate_generator(data_generator_for_testing(datapath, SHAPE_107), steps=1000)
 
     def loss_point_pred(self, x):
         self.lp_model.load_weights('../checkpoint/loss_point/weights_without_zimo.best.hdf5')
@@ -68,7 +68,8 @@ class Prediction:
 
 if __name__ == '__main__':
     pred = Prediction()
-    print pred.loss_point_evaluate()
+    #print pred.loss_point_evaluate()
+    pred.waiting_tiles_evaluate(WT_VAL)
     '''
     for test in testli:
         data = dg.data2tiles(test)
