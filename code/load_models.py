@@ -33,14 +33,14 @@ config = tf.ConfigProto(
 )
 set_session(tf.Session(config=config))
 
-def data_generator_for_testing(datapath, shape):
+def wt_data_generator_for_testing(datapath, shape):
     batch_x, batch_y = [], []
     count = 0
     with open(datapath) as f:
         for line in f:
-            gen = gs.data_gen_value(line)
+            gen = gs.data_gen(line)
             item = gen[-1]
-            x, y = dg.lp_data_gen(item)
+            x, y = dg.wt_data_gen(item)
             batch_x.append(np.reshape(x, shape))
             batch_y.append(y)
             count += 1
@@ -65,7 +65,7 @@ class Prediction:
         return self.wt_model.predict(np.reshape(x, [1, 6, 6, 107]))
 
     def waiting_tiles_evaluate(self, datapath):
-        return self.wt_model.evaluate_generator(data_generator_for_testing(datapath, SHAPE_107), steps=1000)
+        return self.wt_model.evaluate_generator(wt_data_generator_for_testing(datapath, SHAPE_107), steps=1000)
 
     '''
     def loss_point_pred(self, x):

@@ -33,6 +33,21 @@ class DataGenerator:
                 data[7][i].pop((3-j)*2)
         '''
         return data
+
+    @staticmethod
+    def status_data2tiles(_data):
+        data = list(_data)
+        for i in range(4):
+            data[1][i] = sorted(gs.numlist2tiles(data[1][i]))
+            data[2][i] = gs.numlist2tiles(data[2][i])
+        for i in range(4):
+            data[3][i] = gs.numlist2tiles(data[3][i])
+        '''
+        for i in range(len(data[7])):
+            for j in range(4):
+                data[7][i].pop((3-j)*2)
+        '''
+        return data
          
     @staticmethod
     def x_y(data):
@@ -394,6 +409,9 @@ class DataGenerator:
             for j in range(len(gen[i])):
                 gen[i][j] = gen[i][j].split(',')
                 gen[i][j] = [int(x) for x in gen[i][j] if x != '999']
+        for i in range(4):
+            if gen[2][i]:
+                gen[2][i] = [[x for x in gen[2][i]]]
         gen[4] = gen[4].split(',')
         gen[4] = [int(x) for x in gen[4]]
         gen[5] = int(gen[5])
@@ -432,8 +450,7 @@ if __name__ == '__main__':
             print(DataGenerator.wton_data_gen(test)[1])
     '''
     with open('../data/discard_validation.dat') as f:
-        lines = f.readlines(3)
-    for line in lines:
-        print(line)
-        x, y = DataGenerator.discard_data_gen(line)
-        print(y)
+        lines = f.readline()
+    #for line in lines:
+        x, y = DataGenerator.discard_data_gen(lines)
+        print(x, y)

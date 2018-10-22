@@ -502,6 +502,7 @@ if __name__ == '__main__':
     with open('../xml_data/fz_test.dat', 'r+') as f:
         tests = f.readlines()
     for test in tests:
+        print(test)
         for item in GameSimulation.data_gen(test):
             print(item)
 
