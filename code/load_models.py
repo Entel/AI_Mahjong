@@ -2,6 +2,8 @@ from game_simulation import GameSimulation as gs
 from training_data_value import DataGenerator as dg
 #from loss_point_nn import lossPointPredict as lpp
 from waiting_tiles_nn import WaitingTilesPrediction as wtp 
+from wton_nn import waitingOrNot as wton
+from discard_nn import DiscardTile as dt
 
 import numpy as np
 import tensorflow as tf
@@ -23,6 +25,8 @@ SHAPE_107 = [6, 6, 107]
 LOSS_POINT_MODEL = '../checkpoint/loss_point/weights_training.best.hdf5'
 ZIMO_DATA = '../xml_data/zimo.dat'
 WT_MODEL = '../model/waiting_tile.model'
+WTON_MODEL = '../model/waiting_or_not.model'
+DT_MODEL = '../model/discard_tile.model'
 WT_VAL = '../xml_data/wt_validation.dat'
 
 config = tf.ConfigProto(
@@ -33,7 +37,7 @@ config = tf.ConfigProto(
 )
 set_session(tf.Session(config=config))
 
-def wt_data_generator_for_testing(datapath, shape):
+def wt_data_generator_for_testing(datapath):
     batch_x, batch_y = [], []
     count = 0
     with open(datapath) as f:
@@ -41,15 +45,58 @@ def wt_data_generator_for_testing(datapath, shape):
             gen = gs.data_gen(line)
             item = gen[-1]
             x, y = dg.wt_data_gen(item)
-            batch_x.append(np.reshape(x, shape))
+            batch_x.append(np.reshape(x, SHAPE_107))
             batch_y.append(y)
             count += 1
             
-            if count == 64:
+            if count == 1000:
                 yield np.array(batch_x), np.array(batch_y)
                 count = 0
                 batch_x = []
                 batch_y = []
+            else:
+                if not batch_x:
+                    yield np.array(batch_x), np.array(batch_y)
+
+def wton_data_generator_for_testing(datapath):
+    batch_x, batch_y = [], []
+    count = 0
+    #while True:
+    with open(path) as f:
+        for line in f:
+            gen = gs.data_gen(line)
+            item = gen[-1]
+            x, y = dg.wton_data_gen(item)
+            batch_x.append(np.reshape(x, SHAPE_107))
+            batch_y.append(y)
+            count += 1
+            if count == 1000:
+                yield np.array(batch_x), np.array(batch_y)
+                count = 0
+                batch_x = []
+                batch_y = []
+            else:
+                if not batch_x:
+                    yield np.array(batch_x), np.array(batch_y)
+
+def dt_data_generator_for_testing(datapath):
+    batch_x, batch_y = [], []
+    count = 0
+    #whipple True:
+    with open(path) as f:
+        for line in f:
+            x, y = dg.discard_data_gen(line)
+            batch_x.append(np.reshape(x, SHAPE_107))
+            batch_y.append(y)
+            count += 1
+            if count == 1000:
+                yield np.array(batch_x), np.array(batch_y)
+                count = 0
+                batch_x = []
+                batch_y = []
+            else:
+                if not batch_x:
+                    yield np.array(batch_x), np.array(batch_y)
 
 class Prediction:
     def __init__(self):
@@ -61,12 +108,31 @@ class Prediction:
         self.wt_model = self.wt.create_model()
         self.wt_model.load_weights(WT_MODEL)
 
+        self.wton = wton()
+        self.wton_model = self.wton.create_model()
+        self.wton_model.load_weights(WTON_MODEL)
+
+        self.dt = dt()
+        self.dt_model = self.dt.create_model()
+        self.dt_model.load_weights(DT_MODEL)
+
     def waiting_tiles_pred(self, x):
         return self.wt_model.predict(np.reshape(x, [1, 6, 6, 107]))
 
     def waiting_tiles_evaluate(self, datapath):
         return self.wt_model.evaluate_generator(wt_data_generator_for_testing(datapath, SHAPE_107), steps=1000)
 
+    def waiting_or_not_pred(self, x):
+        return self.wton_model.predict(np.reshape(x, [1, 6, 6, 107]))
+
+    def waiting_or_not_evaluate(self, datapath):
+        return self.wton_model.evaluate_generator(wton_data_generator_for_testing(datapath, SHAPE_107), steps=1000)
+
+    def discard_tile_pred(self, x):
+        return self.wton_model.predict(np.reshape(x, [1, 6, 6, 107]))
+
+    def discard_tile_evaluate(self, datapath):
+        return self.wton_model.evaluate_generator(wton_data_generator_for_testing(datapath, SHAPE_107), steps=1000)
     '''
     def loss_point_pred(self, x):
         self.lp_model.load_weights('../checkpoint/loss_point/weights_without_zimo.best.hdf5')

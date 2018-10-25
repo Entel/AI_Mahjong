@@ -137,8 +137,9 @@ def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
                 count = 0
                 batch_x = []
                 batch_y = []
-        else:
-            yield np.array(batch_x), np.array(batch_y)
+            else:
+                if not batch_x:
+                    yield np.array(batch_x), np.array(batch_y)
 
 
 if __name__ == '__main__':
