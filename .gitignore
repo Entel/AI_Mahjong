@@ -1,0 +1,10 @@
+logs/
+data/
+xml_data/
+checkpoint/
+model/
+renamed_data/
+unprocessed_data/
+xml_data/
+*.csv
+*.pyc
