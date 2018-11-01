@@ -28,8 +28,8 @@ set_session(tf.Session(config=config))
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
 batch_size = 64
-SUB_DATA_SIZE = 20000
-epochs = 3000
+SUB_DATA_SIZE = 40000
+epochs = 150
 
 TRAININGDATA = '../data/discard_training.dat'
 VALIDATIONDATA = '../data/discard_validation.dat'

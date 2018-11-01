@@ -85,13 +85,14 @@ def compress_large_file(datapath, fname, parts):
         compress_data(datapath+ fname + '.dat.p' + str(i), '../compressed_data/' + fname + '.gzip.p' + str(i))
         print('Compressed: ' + fname + ' part' + str(i))
 
-def unzip_large_file(datapath, fname. parts):
+def unzip_large_file(datapath, fname, parts):
     for i in range(parts):
-        unzip_data('../compressed_data/' + fname + '.dat.p' + str(i), datapath + fname + '.gzip.p' + str(i))
-        print('Compressed: ' + fname + ' part' + str(i))
+        unzip_data('../compressed_data/' + fname + '.gzip.p' + str(i), datapath + fname + '.dat.p' + str(i))
+        print('Unzip: ' + fname + ' part' + str(i))
     file_concatenate(datapath, fname, parts)
 
 if __name__ == '__main__':
     #compress_list()
-    compress_large_file(DAT_PATH, DISCARD_DATA, 4)
+    #compress_large_file(DAT_PATH, DISCARD_DATA, 4)
     #unzip_list()
+    unzip_data('../compressed_data/discard_validation.gzip', '../data/discard_validation.dat')

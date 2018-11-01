@@ -24,15 +24,19 @@ SHAPE_107 = [6, 6, 107]
 
 LOSS_POINT_MODEL = '../checkpoint/loss_point/weights_training.best.hdf5'
 ZIMO_DATA = '../xml_data/zimo.dat'
+
 WT_MODEL = '../model/waiting_tile.model'
 WTON_MODEL = '../model/waiting_or_not.model'
-DT_MODEL = '../model/discard_tile.model'
+DT_MODEL = '../checkpoint/discard_tile/discard_tiles.improvement_01_0.916.hdf5'
+
 WT_VAL = '../xml_data/wt_validation.dat'
+WTON_VAL = '../xml_data/wton_validation.dat'
+DT_VAL = '../data/discard_validation.dat'
 
 config = tf.ConfigProto(
     gpu_options = tf.GPUOptions(
-        per_process_gpu_memory_fraction = 0.2,
-        visible_device_list = '2'
+        per_process_gpu_memory_fraction = 0.1,
+        visible_device_list = '1'
     )
 )
 set_session(tf.Session(config=config))
@@ -62,7 +66,7 @@ def wton_data_generator_for_testing(datapath):
     batch_x, batch_y = [], []
     count = 0
     #while True:
-    with open(path) as f:
+    with open(datapath) as f:
         for line in f:
             gen = gs.data_gen(line)
             item = gen[-1]
@@ -83,7 +87,7 @@ def dt_data_generator_for_testing(datapath):
     batch_x, batch_y = [], []
     count = 0
     #whipple True:
-    with open(path) as f:
+    with open(datapath) as f:
         for line in f:
             x, y = dg.discard_data_gen(line)
             batch_x.append(np.reshape(x, SHAPE_107))
@@ -120,19 +124,19 @@ class Prediction:
         return self.wt_model.predict(np.reshape(x, [1, 6, 6, 107]))
 
     def waiting_tiles_evaluate(self, datapath):
-        return self.wt_model.evaluate_generator(wt_data_generator_for_testing(datapath, SHAPE_107), steps=1000)
+        return self.wt_model.evaluate_generator(wt_data_generator_for_testing(datapath), steps=1000)
 
     def waiting_or_not_pred(self, x):
         return self.wton_model.predict(np.reshape(x, [1, 6, 6, 107]))
 
     def waiting_or_not_evaluate(self, datapath):
-        return self.wton_model.evaluate_generator(wton_data_generator_for_testing(datapath, SHAPE_107), steps=1000)
+        return self.wton_model.evaluate_generator(wton_data_generator_for_testing(datapath), steps=81)
 
     def discard_tile_pred(self, x):
-        return self.wton_model.predict(np.reshape(x, [1, 6, 6, 107]))
+        return self.dt_model.predict(np.reshape(x, [1, 6, 6, 107]))
 
     def discard_tile_evaluate(self, datapath):
-        return self.wton_model.evaluate_generator(wton_data_generator_for_testing(datapath, SHAPE_107), steps=1000)
+        return self.dt_model.evaluate_generator(dt_data_generator_for_testing(datapath), steps=34)
     '''
     def loss_point_pred(self, x):
         self.lp_model.load_weights('../checkpoint/loss_point/weights_without_zimo.best.hdf5')
@@ -146,7 +150,9 @@ class Prediction:
 if __name__ == '__main__':
     pred = Prediction()
     #print pred.loss_point_evaluate()
-    pred.waiting_tiles_evaluate(WT_VAL)
+    #pred.waiting_tiles_evaluate(WT_VAL)
+    #print(pred.waiting_or_not_evaluate(WTON_VAL))
+    print(pred.discard_tile_evaluate(DT_VAL))
     '''
     for test in testli:
         data = dg.data2tiles(test)
