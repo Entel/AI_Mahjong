@@ -1,4 +1,5 @@
 import numpy as np
+import os
 from itertools import islice
 from game_simulation import GameSimulation as gs
 from training_data_value import DataGenerator as dg
@@ -34,8 +35,8 @@ nClasses = 4
 TRAININGDATA = '../xml_data/wton_training.dat'
 VALIDATIONDATA = '../xml_data/wton_validation.dat'
 WTON_PARAM_PATH = '../model/wether_waiting.model'
-CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.improvement_{epoch:02d}_{val_acc:.3f}.hdf5'
-T_CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.t_improvement_{epoch:02d}_{acc:.3f}.hdf5'
+CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.improvement_{val_acc:.3f}.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.t_improvement_{acc:.3f}.hdf5'
 
 class waitingOrNot:
     def __init__(self):
