@@ -72,6 +72,19 @@ class ResultStatistics():
                         hdf.write(line)
 
     @staticmethod
+    def zimo_add_up(datapath):
+        st = [0, 0]
+        with open(datapath, 'r') as f:
+            for line in f:
+                root = ResultStatistics.init_data(line)
+                zimo, agaris, who = ResultStatistics.agari_tag(root)
+                if zimo:
+                    st[1] += 1
+                else:
+                    st[0] += 1
+        return st
+    @staticmethod
+
     def lp_add_up(datapath):
         st = [0 for i in range(len(TEN_MATRIX))]
         with open(datapath, 'r') as f:
@@ -299,7 +312,7 @@ class ResultStatistics():
 if __name__ == '__main__':
     #print(ResultStatistics.lp_collect_data())
     #print(ResultStatistics.lp_add_up(HOZYU_DATA))
-    #print ResultStatistics.add_up('../xml_data/xml_valid_record.dat')
+    print ResultStatistics.zimo_add_up(XML_DATA)
     #print ResultStatistics.machi_add_up('../xml_data/shuf_xml_record.dat')
     #print ResultStatistics.wt_collect_data()
     #print(ResultStatistics.wt_add_up(HOZYU_DATA))
@@ -314,4 +327,4 @@ if __name__ == '__main__':
 
     #print(ResultStatistics.discard_add_up(XML_DATA))
     #print(ResultStatistics.discard_collect(TMP_FILE, DISCARD_DATA))
-    ResultStatistics.file_division(99000*34, DISCARD_DATA, DISCARD_TRAINING, DISCARD_VALIDATION)
+    #ResultStatistics.file_division(99000*34, DISCARD_DATA, DISCARD_TRAINING, DISCARD_VALIDATION)

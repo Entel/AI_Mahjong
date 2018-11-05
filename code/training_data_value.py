@@ -435,7 +435,7 @@ class DataGenerator:
         _data = DataGenerator.generate_from_status(line)
         mesen_data = DataGenerator.mesen_transfer(_data)
         mesen_data = DataGenerator.data2tiles(mesen_data)
-        return DataGenerator.wt_x_gen(mesen_data), DataGenerator.wt_y_gen(mesen_data)
+        return DataGenerator.wt_x_gen(mesen_data), DataGenerator.discard_y_gen(mesen_data)
 
 if __name__ == '__main__':
     #for test in testli:
@@ -449,8 +449,10 @@ if __name__ == '__main__':
             print(test)
             print(DataGenerator.wton_data_gen(test)[1])
     '''
-    with open('../data/discard_validation.dat') as f:
+    with open('../data/discard_training.dat') as f:
         lines = f.readline()
     #for line in lines:
         x, y = DataGenerator.discard_data_gen(lines)
-        print(x, y)
+        for item in x:
+            print(item)
+        print(y)

@@ -27,12 +27,13 @@ ZIMO_DATA = '../xml_data/zimo.dat'
 
 WT_MODEL = '../model/waiting_tile.model'
 WTON_MODEL = '../model/waiting_or_not.model'
-DT_MODEL = '../checkpoint/discard_tile/discard_tiles.improvement_01_0.916.hdf5'
+DT_MODEL = '../model/discard_tiles.improvement_01_0.916.hdf5'
 
 WT_VAL = '../xml_data/wt_validation.dat'
 WTON_VAL = '../xml_data/wton_validation.dat'
 DT_VAL = '../data/discard_validation.dat'
 
+'''
 config = tf.ConfigProto(
     gpu_options = tf.GPUOptions(
         per_process_gpu_memory_fraction = 0.1,
@@ -40,6 +41,7 @@ config = tf.ConfigProto(
     )
 )
 set_session(tf.Session(config=config))
+'''
 
 def wt_data_generator_for_testing(datapath):
     batch_x, batch_y = [], []
@@ -108,6 +110,7 @@ class Prediction:
         #self.lp = lpp()
         #self.lp_model = self.lp.create_model()
 
+        '''
         self.wt = wtp()
         self.wt_model = self.wt.create_model()
         self.wt_model.load_weights(WT_MODEL)
@@ -115,11 +118,13 @@ class Prediction:
         self.wton = wton()
         self.wton_model = self.wton.create_model()
         self.wton_model.load_weights(WTON_MODEL)
+        '''
 
         self.dt = dt()
         self.dt_model = self.dt.create_model()
         self.dt_model.load_weights(DT_MODEL)
 
+    '''
     def waiting_tiles_pred(self, x):
         return self.wt_model.predict(np.reshape(x, [1, 6, 6, 107]))
 
@@ -131,6 +136,7 @@ class Prediction:
 
     def waiting_or_not_evaluate(self, datapath):
         return self.wton_model.evaluate_generator(wton_data_generator_for_testing(datapath), steps=81)
+    '''
 
     def discard_tile_pred(self, x):
         return self.dt_model.predict(np.reshape(x, [1, 6, 6, 107]))
