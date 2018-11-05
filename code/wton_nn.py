@@ -18,7 +18,7 @@ from keras.backend.tensorflow_backend import set_session
 
 config = tf.ConfigProto(
     gpu_options = tf.GPUOptions(
-        per_process_gpu_memory_fraction=0.2,
+        per_process_gpu_memory_fraction=0.1,
         visible_device_list = '1'
     )
 )
@@ -27,8 +27,8 @@ set_session(tf.Session(config=config))
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
 batch_size = 64
-epochs = 3000
-SUB_DATA_SIZE = 20000
+epochs = 1000
+SUB_DATA_SIZE = 40000
 nClasses = 4
 
 TRAININGDATA = '../xml_data/wton_training.dat'
@@ -115,7 +115,7 @@ class waitingOrNot:
                     epochs = 1,  
                     batch_size = batch_size, 
                     #validation_data = valid_data, 
-                    validation_split = 0.2,
+                    validation_split = 0.3,
                     shuffle = True, 
                     callbacks = [self.tensorboard, self.checkpoint, self.t_checkpoint])
 
