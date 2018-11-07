@@ -6,6 +6,7 @@ from training_data_value import DataGenerator as dg
 
 import keras
 import tensorflow as tf
+from keras import regularizers
 from keras.models import Sequential, load_model
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Dense, Dropout, Activation, Flatten
