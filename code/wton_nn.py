@@ -19,7 +19,7 @@ from keras.backend.tensorflow_backend import set_session
 
 config = tf.ConfigProto(
     gpu_options = tf.GPUOptions(
-        per_process_gpu_memory_fraction=0.1,
+        per_process_gpu_memory_fraction=0.2,
         visible_device_list = '1'
     )
 )
@@ -28,7 +28,7 @@ set_session(tf.Session(config=config))
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
 batch_size = 64
-epochs = 1000
+epochs = 128
 SUB_DATA_SIZE = 40000
 nClasses = 4
 
@@ -49,7 +49,7 @@ class waitingOrNot:
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='auto')
-        self.t_checkpoint = ModelCheckpoint(CHECKPOINT_PATH, 
+        self.t_checkpoint = ModelCheckpoint(T_CHECKPOINT_PATH, 
                                     monitor='acc', 
                                     verbose=1, 
                                     save_best_only=True, 
@@ -58,7 +58,7 @@ class waitingOrNot:
     def create_model(self):
         model = Sequential()
         
-        model.add(Conv2D(512, (2, 2), padding='same', activation='relu', input_shape=input_shape))
+        model.add(Conv2D(512, (2, 2), padding='same', activation='relu', input_shape=input_shape, kernel_regularizer=regularizers.l2(0.01)))
         model.add(BatchNormalization())
         model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
         model.add(Dropout(0.25))
