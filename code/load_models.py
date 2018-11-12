@@ -26,14 +26,13 @@ LOSS_POINT_MODEL = '../checkpoint/loss_point/weights_training.best.hdf5'
 ZIMO_DATA = '../xml_data/zimo.dat'
 
 WT_MODEL = '../model/waiting_tile.model'
-WTON_MODEL = '../model/wton.model'
-DT_MODEL = '../model/discard_tiles.improvement_01_0.916.hdf5'
+WTON_MODEL = '../model/wether_waiting.model'
+DT_MODEL = '../checkpoint/discard_tile/discard_tiles.improvement_01_0.926.hdf5'
 
 WT_VAL = '../xml_data/wt_validation.dat'
 WTON_VAL = '../xml_data/wton_training.dat'
 DT_VAL = '../data/discard_validation.dat'
 
-'''
 config = tf.ConfigProto(
     gpu_options = tf.GPUOptions(
         per_process_gpu_memory_fraction = 0.1,
@@ -41,7 +40,6 @@ config = tf.ConfigProto(
     )
 )
 set_session(tf.Session(config=config))
-'''
 
 def wt_data_generator_for_testing(datapath):
     batch_x, batch_y = [], []
@@ -157,7 +155,7 @@ if __name__ == '__main__':
     #print pred.loss_point_evaluate()
     #pred.waiting_tiles_evaluate(WT_VAL)
     print(pred.waiting_or_not_evaluate(WTON_VAL))
-    #print(pred.discard_tile_evaluate(DT_VAL))
+    print(pred.discard_tile_evaluate(DT_VAL))
     '''
     for test in testli:
         data = dg.data2tiles(test)
