@@ -309,10 +309,17 @@ class ResultStatistics():
                         st[tile] -= 1
         return st
 
+    @staticmethod
+    def data_combine(origin_data, addition_data):
+        with open(addition_data, 'r') as af, open(origin_data) as of:
+            for line in af:
+                of.write(line)
+        
+
 if __name__ == '__main__':
     #print(ResultStatistics.lp_collect_data())
     #print(ResultStatistics.lp_add_up(HOZYU_DATA))
-    print ResultStatistics.zimo_add_up(XML_DATA)
+    #print ResultStatistics.zimo_add_up(XML_DATA)
     #print ResultStatistics.machi_add_up('../xml_data/shuf_xml_record.dat')
     #print ResultStatistics.wt_collect_data()
     #print(ResultStatistics.wt_add_up(HOZYU_DATA))
