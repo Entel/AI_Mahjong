@@ -35,7 +35,7 @@ TRAININGDATA = '../data/discard_training.dat'
 VALIDATIONDATA = '../data/discard_validation.dat'
 DT_PARAM_PATH = '../model/discard_tile.model'
 CHECKPOINT_PATH = '../checkpoint/discard_tile/discard_tiles.improvement_{epoch:02d}_{val_acc:.3f}.hdf5'
-T_CHECKPOINT_PATH = '../checkpoint/discard_tiles/discard_tiles.t_improvement_{epoch:02d}_{acc:.3f}.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/discard_tile/discard_tiles.t_improvement_{epoch:02d}_{acc:.3f}.hdf5'
 
 class DiscardTile:
     def __init__(self):
