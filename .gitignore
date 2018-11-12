@@ -6,6 +6,6 @@ model/
 renamed_data/
 unprocessed_data/
 xml_data/
-load_model.py
+code/load_model.py
 *.csv
 *.pyc
