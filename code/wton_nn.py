@@ -29,13 +29,13 @@ set_session(tf.Session(config=config))
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
 batch_size = 64
-epochs = 128
+epochs = 150
 SUB_DATA_SIZE = 40000
 nClasses = 4
 
 TRAININGDATA = '../xml_data/wton_training.dat'
 VALIDATIONDATA = '../xml_data/wton_validation.dat'
-WTON_PARAM_PATH = '../model/wether_waiting.model'
+WTON_PARAM_PATH = '../model/wton_nn.model'
 CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.improvement_{val_acc:.3f}.hdf5'
 T_CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.t_improvement_{acc:.3f}.hdf5'
 

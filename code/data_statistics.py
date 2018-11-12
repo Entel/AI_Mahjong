@@ -311,9 +311,9 @@ class ResultStatistics():
 
     @staticmethod
     def data_combine(origin_data, addition_data):
-        with open(addition_data, 'r') as af, open(origin_data) as of:
+        with open(addition_data, 'r') as af, open(origin_data, 'a+') as orf:
             for line in af:
-                of.write(line)
+                orf.write(line)
         
 
 if __name__ == '__main__':
@@ -335,3 +335,4 @@ if __name__ == '__main__':
     #print(ResultStatistics.discard_add_up(XML_DATA))
     #print(ResultStatistics.discard_collect(TMP_FILE, DISCARD_DATA))
     #ResultStatistics.file_division(99000*34, DISCARD_DATA, DISCARD_TRAINING, DISCARD_VALIDATION)
+    ResultStatistics.data_combine('../xml_data/wton_training.dat', '../xml_data/wton_validation.dat')
