@@ -119,7 +119,7 @@ class DiscardTile:
                     shuffle = True, 
                     callbacks = [self.tensorboard, self.checkpoint, self.t_checkpoint])
 
-        model.save(WT_PARAM_PATH)
+        model.save(DT_PARAM_PATH)
         return model
              
 def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
