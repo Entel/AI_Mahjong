@@ -28,15 +28,15 @@ set_session(tf.Session(config=config))
 input_shape = (6, 6, 107)
 SHAPE = [6, 6, 107]
 batch_size = 64
-SUB_DATA_SIZE = 20000
-epochs = 3000
+SUB_DATA_SIZE = 40000
+epochs = 300
 
 TRAININGDATA = '../xml_data/wt_training.dat'
 VALIDATIONDATA = '../xml_data/wt_validation.dat'
 WTON_PARAM_PATH = '../model/wether_waiting.model'
 WT_PARAM_PATH = '../model/waiting_tile.model'
-CHECKPOINT_PATH = '../checkpoint/waiting_tiles/waiting_tiles.improvement_{epoch:02d}_{val_acc:.3f}.hdf5'
-T_CHECKPOINT_PATH = '../checkpoint/waiting_tiles/waiting_tiles.t_improvement_{epoch:02d}_{acc:.3f}.hdf5'
+CHECKPOINT_PATH = '../checkpoint/waiting_tiles/waiting_tiles.improvement_{val_acc:.3f}.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/waiting_tiles/waiting_tiles.t_improvement_{acc:.3f}.hdf5'
 
 class WaitingTilesPrediction:
     def __init__(self):
