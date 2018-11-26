@@ -84,6 +84,7 @@ class lossPointPredict:
 
     def training(self):
         model = self.create_model()
+        '''
         line_count = 0
         data_list = []
         batch_x = []
@@ -111,6 +112,7 @@ class lossPointPredict:
                 batch_y.append(y)
         model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, validation_data=(np.array(valid_x), np.array(valid_y)) ,shuffle=True, callbacks=[self.tensorboard, self.checkpoint, self.checkpoint_training])
         #model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, validation_split=0.2, shuffle=True, callbacks=[self.tensorboard, self.checkpoint, self.checkpoint_training])
+	'''
                             
         model.save(LOSS_POINT_PATH)
         return model
