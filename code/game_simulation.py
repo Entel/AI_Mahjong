@@ -67,8 +67,21 @@ class GameSimulation:
     def point_change(agari_list):
         final_point = []
         for agari_tag in agari_list:
+            print(agari_tag)
             final_point.append(int(agari_tag.get('ten').split(',')[1]))
         return final_point
+
+    @staticmethod
+    def agari_yaku(agari_list):
+        yaku = []
+        for agari_tag in agari_list:
+            hansu = []
+            if agari_tag.get('yaku'):
+                han = agari_tag.get('yaku').split(',')
+                sit = int(len(han)/2)
+                hansu = [int(han[2*x+1]) for x in range(sit)]
+                yaku.append(sum(hansu))
+        return yaku
     
     @staticmethod
     def dorahai(init_tag):
@@ -284,7 +297,7 @@ class GameSimulation:
                 nagare.append(ET.tostring(child)) #string
         hai = GameSimulation.init_hai(init_tag)
         oya = GameSimulation.init_oya(init_tag)
-        final_point = GameSimulation.point_change(agari_tag)
+        final_point = GameSimulation.agari_yaku(agari_tag)
         hands = hai
         dorahai = []
         dorahai.append(GameSimulation.num2tiles(GameSimulation.dorahai(init_tag)))

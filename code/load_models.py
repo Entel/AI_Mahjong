@@ -27,7 +27,7 @@ ZIMO_DATA = '../xml_data/zimo.dat'
 
 WT_MODEL = '../model/waiting_tile.model'
 WTON_MODEL = '../model/wether_waiting.model'
-DT_MODEL = '../checkpoint/discard_tile/discard_tiles.improvement_01_0.926.hdf5'
+DT_MODEL = '../model/dt.model'
 
 WT_VAL = '../xml_data/wt_validation.dat'
 WTON_VAL = '../xml_data/wton_training.dat'
@@ -112,10 +112,10 @@ class Prediction:
         self.wt_model = self.wt.create_model()
         self.wt_model.load_weights(WT_MODEL)
 
-        '''
         self.wton = wton()
         self.wton_model = self.wton.create_model()
         self.wton_model.load_weights(WTON_MODEL)
+        '''
 
         self.dt = dt()
         self.dt_model = self.dt.create_model()
@@ -128,12 +128,12 @@ class Prediction:
     def waiting_tiles_evaluate(self, datapath):
         return self.wt_model.evaluate_generator(wt_data_generator_for_testing(datapath), steps=1000)
 
-    '''
     def waiting_or_not_pred(self, x):
         return self.wton_model.predict(np.reshape(x, [1, 6, 6, 107]))
 
     def waiting_or_not_evaluate(self, datapath):
         return self.wton_model.evaluate_generator(wton_data_generator_for_testing(datapath), steps=240)
+    '''
 
     def discard_tile_pred(self, x):
         return self.dt_model.predict(np.reshape(x, [1, 6, 6, 107]))
@@ -152,9 +152,8 @@ class Prediction:
 
 if __name__ == '__main__':
     pred = Prediction()
-    #print pred.loss_point_evaluate()
     #pred.waiting_tiles_evaluate(WT_VAL)
-    print(pred.waiting_or_not_evaluate(WTON_VAL))
+    #print(pred.waiting_or_not_evaluate(WTON_VAL))
     print(pred.discard_tile_evaluate(DT_VAL))
     '''
     for test in testli:

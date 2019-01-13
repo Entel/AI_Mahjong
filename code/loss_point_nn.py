@@ -25,15 +25,16 @@ set_session(tf.Session(config=config))
 
 input_shape = (6, 6, 108)
 SHAPE = [6, 6, 108]
-epochs = 1000
-batch_size = 32
+epochs = 200
+batch_size = 64
+SUB_DATA_SIZE = 40000
+nClasses = 9
 
-DATAPATH = '../xml_data/lp_rd_collect_data.dat'
 TRAININGPATH = '../xml_data/lp_training.dat'
 VALIDPATH = '../xml_data/lp_validation.dat'
-LOSS_POINT_PATH = '../model/loss_point_without_zimo.model'
-CHECKPOINT_PATH = '../checkpoint/loss_point/weights.best.hdf5'
-T_CHECKPOINT_PATH = '../checkpoint/loss_point/weights_training.best.hdf5'
+LOSS_POINT_PATH = '../model/loss_point.model'
+CHECKPOINT_PATH = '../checkpoint/loss_point/lp.improvement_{val_acc:.3f}.best.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/loss_point/lp.t_improvement_{acc:.3f}.best.hdf5'
 
 class lossPointPredict:
     def __init__(self):
@@ -74,7 +75,7 @@ class lossPointPredict:
         model.add(Flatten())
         model.add(Dense(1024, activation='relu'))
         model.add(Dense(256, activation='relu'))
-        model.add(Dense(9, activation='softmax'))
+        model.add(Dense(6, activation='softmax'))
     
         adam = Adam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
         model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['acc'])
@@ -84,6 +85,7 @@ class lossPointPredict:
 
     def training(self):
         model = self.create_model()
+        '''
         line_count = 0
         data_list = []
         batch_x = []
@@ -112,12 +114,49 @@ class lossPointPredict:
         model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, validation_data=(np.array(valid_x), np.array(valid_y)) ,shuffle=True, callbacks=[self.tensorboard, self.checkpoint, self.checkpoint_training])
         #model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, validation_split=0.2, shuffle=True, callbacks=[self.tensorboard, self.checkpoint, self.checkpoint_training])
                             
+        '''
+        for e in range(epochs):
+            print('Epoch %d ---------------------------------------------' % e)
+            os.system('shuf ' + TRAININGDATA + ' -o ' + TRAININGDATA)
+            for X, Y in generate_data_from_file():
+                model.fit(X, Y, 
+                    epochs = 1,  
+                    batch_size = batch_size, 
+                    #validation_data = valid_data, 
+                    validation_split = 0.3,
+                    shuffle = True, 
+                    callbacks = [self.tensorboard, self.checkpoint, self.t_checkpoint])
+
         model.save(LOSS_POINT_PATH)
         return model
 
     def pred(self, model_path):
         model = load_model(model_path)
         return model
+
+def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
+    batch_x, batch_y = [], []
+    count = 0
+    #while True:
+    with open(path) as f:
+        for line in f:
+            gen = gs.data_gen(line)
+            item = gen[-1]
+
+            x, y = dg.lp_data_gen(item)
+            batch_x.append(np.reshape(x, SHAPE))
+            batch_y.append([1])
+            count += 1
+
+            if count == SUB_DATA_SIZE:
+                yield np.array(batch_x), np.array(batch_y)
+                count = 0
+                batch_x = []
+                batch_y = []
+            else:
+                if not batch_x:
+                    yield np.array(batch_x), np.array(batch_y)
+
 
 if __name__ == '__main__':
     '''

@@ -259,32 +259,15 @@ class DataGenerator:
         return x
 
     @staticmethod
-    def lp_y_gen(data, who = 4):
-        y = [0 for i in range(len(TEN_MATRIX))]
-        ten = 0
-        '''
-        if who == 4: 
-            if data[0][0] == 'D':
-                who = 0
-            elif data[0][0] == 'E':
-                who = 1
-            elif data[0][0] == 'F':
-                who = 2
-            elif data[0][0] == 'G':
-                who = 3
-        '''     
-        for loss_point in data[7]:
-            ten += loss_point
-        ten = int(round(ten / 1000))
-        if ten == 0:
-            ten = 1
-        elif ten >= 7 and ten < 8:
-            ten = 8
-        elif ten >= 9 and ten < 12:
-            ten = 12
-        elif ten > 12:
-            ten = 18
-        y[TEN_MATRIX.index(ten)] = 1
+    def lp_y_gen(data):
+        y = [0 for i in range(6)]
+        if not data[7]:
+            yaku = 6
+        else:
+            yaku = sum(data[7])
+            if yaku >= 6:
+                yaku = 6
+        y[yaku-1] = 1
         return y
 
     @staticmethod
@@ -379,7 +362,7 @@ class DataGenerator:
     predict waiting or not 
     '''
     def wton_y_gen(data):
-        _wton = [0 for i in range(4)]
+        _wton = [0]
         who = data[8][0]
         fromWho = data[9][0]
         if fromWho == 0:
@@ -396,7 +379,7 @@ class DataGenerator:
         #DataGenerator.return_to_last_turn(_data)
         mesen_data = DataGenerator.mesen_transfer(_data)
         mesen_data = DataGenerator.data2tiles(mesen_data)
-        return DataGenerator.wt_x_gen(mesen_data), DataGenerator.wton_y_gen(mesen_data)
+        return DataGenerator.wt_x_gen(mesen_data)
 
     '''
     discard tile data generator

@@ -83,19 +83,22 @@ class ResultStatistics():
                 else:
                     st[0] += 1
         return st
-    @staticmethod
 
+    @staticmethod
     def lp_add_up(datapath):
-        st = [0 for i in range(len(TEN_MATRIX))]
+        st = [0 for i in range(7)]
         with open(datapath, 'r') as f:
             for line in f:
-                root = ResultStatistics.init_data(line)
-                zimo, agaris, who = ResultStatistics.agari_tag(root)
-                if not zimo:
-                    for agari in agaris:
-                        st[ResultStatistics.ten_range(agari)] += 1
+                gen = gs.data_gen(line)
+                if not gen[-1][7]:
+                    st[6] += 1
+                else:
+                    yaku = sum(gen[-1][7])
+                    if yaku >= 6:
+                        yaku = 6
+                    st[yaku-1] += 1
+                print(st)
         return st
-                
 
     @staticmethod
     def num2tiles(num):
@@ -106,25 +109,23 @@ class ResultStatistics():
 
     @staticmethod
     def lp_collect_data():
-        st = [5000 for i in range(len(TEN_MATRIX))]
-        for i in range(2):
+        st = [16500 for i in range(6)]
+            
+        with open(LP_TRAINING, 'a+') as lpf:
             with open(HOZYU_DATA, 'r') as f:
                 #read a line of data and turn it into a game tree
                 for line in f:
-                    root = ResultStatistics.init_data(line)
-                    agari = root.find('AGARI')
-                    #judge if it's zimo
-                    who = agari.get('who')
-                    fromWho = agari.get('fromWho')
-                    if who != fromWho: 
-                        #if it is needed
-                        ten_index = ResultStatistics.ten_range(agari)
-                        if st[ten_index] != 0:
-                            #add to new file
-                            with open(LP_XML_DATA, 'a+') as rf:
-                                rf.write(line)
-                            st[ten_index] -= 1
-
+                    gen = gs.data_gen(line)
+                    if not gen[-1][7]:
+                        st[5] -= 1
+                        lpf.write(line)
+                    else:
+                        yaku = sum(gen[-1][7])
+                        if yaku >= 6:
+                            yaku = 6
+                        if st[yaku-1] != 0:
+                            lpf.write(line)
+                            st[yaku-1] -= 1
         return st
 
     @staticmethod
@@ -317,7 +318,7 @@ class ResultStatistics():
         
 
 if __name__ == '__main__':
-    #print(ResultStatistics.lp_collect_data())
+    print(ResultStatistics.lp_collect_data())
     #print(ResultStatistics.lp_add_up(HOZYU_DATA))
     #print ResultStatistics.zimo_add_up(XML_DATA)
     #print ResultStatistics.machi_add_up('../xml_data/shuf_xml_record.dat')
@@ -335,4 +336,4 @@ if __name__ == '__main__':
     #print(ResultStatistics.discard_add_up(XML_DATA))
     #print(ResultStatistics.discard_collect(TMP_FILE, DISCARD_DATA))
     #ResultStatistics.file_division(99000*34, DISCARD_DATA, DISCARD_TRAINING, DISCARD_VALIDATION)
-    ResultStatistics.data_combine('../xml_data/wton_training.dat', '../xml_data/wton_validation.dat')
+    #ResultStatistics.data_combine('../xml_data/wton_training.dat', '../xml_data/wton_validation.dat')

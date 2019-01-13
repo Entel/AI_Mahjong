@@ -1,4 +1,5 @@
 import numpy as np
+import random
 import os
 from itertools import islice
 from game_simulation import GameSimulation as gs
@@ -33,7 +34,7 @@ epochs = 150
 SUB_DATA_SIZE = 40000
 nClasses = 4
 
-TRAININGDATA = '../xml_data/wton_training.dat'
+TRAININGDATA = '../xml_data/hozyu.dat'
 VALIDATIONDATA = '../xml_data/wton_validation.dat'
 WTON_PARAM_PATH = '../model/wton_nn.model'
 CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.improvement_{val_acc:.3f}.hdf5'
@@ -76,11 +77,11 @@ class waitingOrNot:
         model.add(Dense(1024, activation='relu'))
         model.add(Dense(512, activation='relu'))
         model.add(Dense(256, activation='relu'))
-        model.add(Dense(3))
+        model.add(Dense(1))
         model.add(Activation('softmax'))
     
         adam = Adam(lr=10e-6)
-        model.compile(loss='categorical_crossentropy', optimizer=adam, metrics=['accuracy'])
+        model.compile(loss='mean_squared_error', optimizer=adam, metrics=['mse'])
 
         model.summary()
         return model
@@ -131,11 +132,22 @@ def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
     with open(path) as f:
         for line in f:
             gen = gs.data_gen(line)
-            item = gen[-1]
-            x, y = dg.wton_data_gen(item)
+            item_1 = gen[-1]
+            while True:
+                item_2 = random.choice(gen[0:int(len(gen)*3/4)])
+                if not item_2[-5]:
+                    break
+
+            x = dg.wton_data_gen(item_1)
             batch_x.append(np.reshape(x, SHAPE))
-            batch_y.append(y)
+            batch_y.append([1])
             count += 1
+
+            x = dg.wton_data_gen(item_2)
+            batch_x.append(np.reshape(x, SHAPE))
+            batch_y.append([0])
+            count += 1
+
             if count == SUB_DATA_SIZE:
                 yield np.array(batch_x), np.array(batch_y)
                 count = 0
@@ -148,15 +160,13 @@ def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
  
 if __name__ == '__main__':
     '''
-    with open('../test.dat') as f:
+    with open('../xml_data/hozyu.dat') as f:
         for line in f:
+            print(line)
             gen = gs.data_gen(line)
-            for item in gen:
-                waiting, x, wt, y = generate_data_for_waiting(item)
-                if waiting:
-                    print np.array(x).shape, wt, y
+            item = gen[-1]
             break
-    print np.reshape(x, SHAPE)[0]
+        print(item)
     '''
     
     waiting_prediction = waitingOrNot()                

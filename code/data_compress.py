@@ -16,6 +16,7 @@ dat_list = [
     'discard_validation'
     ]
 DISCARD_DATA = 'discard_training'
+LP_TRAINING = '../xml_data/lp_training.dat'
 
 def compress_data(file_path, save_path):
     with open(file_path, 'rb') as f_in, gzip.open(save_path, 'wb') as f_out:
@@ -93,6 +94,7 @@ def unzip_large_file(datapath, fname, parts):
 
 if __name__ == '__main__':
     #compress_list()
+    compress_data(LP_TRAINING, '../compressed_data/lp_training.gzip')
     #compress_large_file(DAT_PATH, DISCARD_DATA, 4)
     #unzip_list()
-    unzip_data('../compressed_data/discard_validation.gzip', '../data/discard_validation.dat')
+    #unzip_data('../compressed_data/discard_validation.gzip', '../data/discard_validation.dat')
