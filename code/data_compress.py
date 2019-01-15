@@ -94,7 +94,7 @@ def unzip_large_file(datapath, fname, parts):
 
 if __name__ == '__main__':
     #compress_list()
-    compress_data(LP_TRAINING, '../compressed_data/lp_training.gzip')
+    unzip_data('../compressed_data/lp_training.gzip', "../xml_data/lp_trainning.dat")
     #compress_large_file(DAT_PATH, DISCARD_DATA, 4)
     #unzip_list()
     #unzip_data('../compressed_data/discard_validation.gzip', '../data/discard_validation.dat')
