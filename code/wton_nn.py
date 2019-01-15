@@ -22,7 +22,7 @@ from keras.backend.tensorflow_backend import set_session
 config = tf.ConfigProto(
     gpu_options = tf.GPUOptions(
         per_process_gpu_memory_fraction=0.2,
-        visible_device_list = '1'
+        visible_device_list = '2'
     )
 )
 set_session(tf.Session(config=config))
