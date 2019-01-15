@@ -110,7 +110,7 @@ class waitingOrNot:
             callbacks=[self.tensorboard, self.checkpoint, self.t_checkpoint])
         '''
         for e in range(epochs):
-            print('Epoch %d' % e)
+            print('Epoch %d =================================================' % e)
             os.system('shuf ' + TRAININGDATA + ' -o ' + TRAININGDATA)
             for X, Y in generate_data_from_file():
                 model.fit(X, Y, 

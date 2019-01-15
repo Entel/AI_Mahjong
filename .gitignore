@@ -7,5 +7,6 @@ renamed_data/
 unprocessed_data/
 xml_data/
 code/load_model.py
+tenhou-python-bot/
 *.csv
 *.pyc
