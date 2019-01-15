@@ -36,12 +36,12 @@ SUB_DATA_SIZE = 40000
 TRAININGDATA = '../xml_data/hozyu.dat'
 VALIDATIONDATA = '../xml_data/wton_validation.dat'
 WTON_PARAM_PATH = '../model/wton_nn.model'
-CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.improvement_{val_acc:.3f}.hdf5'
-T_CHECKPOINT_PATH = '../checkpoint/waiting_or_not/wton.t_improvement_{acc:.3f}.hdf5'
+CHECKPOINT_PATH = '../checkpoint/wton/wton.improvement_{val_acc:.3f}.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/wton/wton.t_improvement_{acc:.3f}.hdf5'
 
 class waitingOrNot:
     def __init__(self):
-        self.tensorboard = TensorBoard(log_dir = '../logs/waiting_or_not',
+        self.tensorboard = TensorBoard(log_dir = '../logs/wton',
                                     histogram_freq = 0,
                                     write_graph = True,
                                     embeddings_freq = 0)

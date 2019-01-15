@@ -8,6 +8,7 @@ import tensorflow as tf
 from keras.models import Sequential, load_model
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Dense, Dropout, Activation, Flatten
+from keras.layers.normalization import BatchNormalization
 from keras.callbacks import EarlyStopping, TensorBoard, ModelCheckpoint
 from keras.initializers import glorot_uniform
 from keras.initializers import uniform
@@ -30,7 +31,7 @@ batch_size= 64
 SUB_DATA_SIZE = 40000
 nClasses = 9
 
-TRAININGPATH = '../xml_data/lp_training.dat'
+TRAININGDATA = '../xml_data/lp_training.dat'
 VALIDPATH = '../xml_data/lp_validation.dat'
 LOSS_POINT_PATH = '../model/loss_point.model'
 CHECKPOINT_PATH = '../checkpoint/loss_point/lp.improvement_{val_acc:.3f}.best.hdf5'
@@ -115,7 +116,6 @@ class lossPointPredict:
         #model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, validation_split=0.2, shuffle=True, callbacks=[self.tensorboard, self.checkpoint, self.checkpoint_training])
 	'''
                             
-        '''
         for e in range(epochs):
             print('Epoch %d ---------------------------------------------' % e)
             os.system('shuf ' + TRAININGDATA + ' -o ' + TRAININGDATA)
@@ -164,14 +164,10 @@ if __name__ == '__main__':
     batch_x, batch_y = [], []
     with open('../xml_data/fz_test.dat') as f:
         for line in f:
-            print line
             gen = gs.data_gen_value(line) 
             for item in gen:
                 pass
-            print item
             data = data_process(item)
-            print data
-            print item
             x, y = dg.lp_data_gen(data)
             batch_x.append(np.reshape(x, SHAPE))
             batch_y.append(y)
