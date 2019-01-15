@@ -59,7 +59,7 @@ def file_split(datapath, datafile, parts):
 
     with open(datapath + datafile) as f:
         for line in f:
-            if p_line_count <= round((line_count + 4) / 4):
+            if p_line_count <= round((line_count + parts) / parts):
                 file_name = datafile + '.p' + str(num)
                 with open(datapath + file_name, 'a') as pf:
                     p_line_count += 1
@@ -83,18 +83,20 @@ def file_concatenate(datapath, datafile, parts):
 def compress_large_file(datapath, fname, parts):
     file_split(datapath, fname, parts)
     for i in range(parts):
-        compress_data(datapath+ fname + '.dat.p' + str(i), '../compressed_data/' + fname + '.gzip.p' + str(i))
+        compress_data(datapath+ fname + '.p' + str(i), '../compressed_data/' + fname + '.gzip.p' + str(i))
         print('Compressed: ' + fname + ' part' + str(i))
 
 def unzip_large_file(datapath, fname, parts):
     for i in range(parts):
-        unzip_data('../compressed_data/' + fname + '.gzip.p' + str(i), datapath + fname + '.dat.p' + str(i))
+        unzip_data('../compressed_data/' + fname + '.gzip.p' + str(i), datapath + fname + '.p' + str(i))
         print('Unzip: ' + fname + ' part' + str(i))
     file_concatenate(datapath, fname, parts)
 
 if __name__ == '__main__':
     #compress_list()
-    unzip_data('../compressed_data/lp_training.gzip', "../xml_data/lp_trainning.dat")
+    #unzip_data('../compressed_data/lp_training.gzip', "../xml_data/lp_trainning.dat")
     #compress_large_file(DAT_PATH, DISCARD_DATA, 4)
+    #compress_large_file('../xml_data/', 'hozyu.dat', 2)
     #unzip_list()
     #unzip_data('../compressed_data/discard_validation.gzip', '../data/discard_validation.dat')
+    unzip_large_file('../xml_data/', 'hozyu.dat', 2)

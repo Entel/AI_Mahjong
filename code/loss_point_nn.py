@@ -49,7 +49,7 @@ class lossPointPredict:
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='auto')
-        self.checkpoint_training = ModelCheckpoint(T_CHECKPOINT_PATH, 
+        self.t_checkpoint = ModelCheckpoint(T_CHECKPOINT_PATH, 
                                     monitor='acc', 
                                     verbose=1, 
                                     save_best_only=True, 
@@ -115,6 +115,7 @@ class lossPointPredict:
         model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, validation_data=(np.array(valid_x), np.array(valid_y)) ,shuffle=True, callbacks=[self.tensorboard, self.checkpoint, self.checkpoint_training])
         #model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, validation_split=0.2, shuffle=True, callbacks=[self.tensorboard, self.checkpoint, self.checkpoint_training])
                             
+        '''
         for e in range(epochs):
             print('Epoch %d ---------------------------------------------' % e)
             os.system('shuf ' + TRAININGDATA + ' -o ' + TRAININGDATA)
@@ -159,6 +160,7 @@ def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
 
 
 if __name__ == '__main__':
+    '''
     batch_x, batch_y = [], []
     with open('../xml_data/fz_test.dat') as f:
         for line in f:
