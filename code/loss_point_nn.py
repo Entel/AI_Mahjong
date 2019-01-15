@@ -113,7 +113,6 @@ class lossPointPredict:
                 batch_y.append(y)
         model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, validation_data=(np.array(valid_x), np.array(valid_y)) ,shuffle=True, callbacks=[self.tensorboard, self.checkpoint, self.checkpoint_training])
         #model.fit(np.array(batch_x), np.array(batch_y), batch_size=batch_size, epochs=epochs, verbose=1, validation_split=0.2, shuffle=True, callbacks=[self.tensorboard, self.checkpoint, self.checkpoint_training])
-	'''
                             
         '''
         for e in range(epochs):
@@ -160,7 +159,6 @@ def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
 
 
 if __name__ == '__main__':
-    '''
     batch_x, batch_y = [], []
     with open('../xml_data/fz_test.dat') as f:
         for line in f:
