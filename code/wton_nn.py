@@ -32,7 +32,6 @@ SHAPE = [6, 6, 107]
 batch_size = 64
 epochs = 150
 SUB_DATA_SIZE = 40000
-nClasses = 4
 
 TRAININGDATA = '../xml_data/hozyu.dat'
 VALIDATIONDATA = '../xml_data/wton_validation.dat'

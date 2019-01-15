@@ -25,8 +25,8 @@ set_session(tf.Session(config=config))
 
 input_shape = (6, 6, 108)
 SHAPE = [6, 6, 108]
-epochs = 200
-batch_size = 64
+epochs = 150
+batch_size= 64
 SUB_DATA_SIZE = 40000
 nClasses = 9
 
@@ -57,18 +57,18 @@ class lossPointPredict:
     def create_model(self):
         model = Sequential()
         
-        model.add(Conv2D(512, (2, 2), padding='same', input_shape=input_shape))
-        model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
-        model.add(Conv2D(512, (4, 4), padding='same', activation='relu', name='layer_512'))
+        model.add(Conv2D(512, (2, 2), padding='same', activation='relu', input_shape=input_shape))
+        model.add(BatchNormalization())
+        model.add(Conv2D(512, (3, 3), padding='same'))
+        model.add(Conv2D(512, (4, 4), padding='same', name='layer_512'))
         model.add(Dropout(0.25))
 
-        model.add(Conv2D(256, (2, 2), padding='same', activation='relu'))
+        model.add(Conv2D(256, (2, 2), padding='same'))
         model.add(Conv2D(256, (3, 3), padding='same', activation='relu', name='layer_256'))
-        model.add(Conv2D(128, (2, 2), padding='same', activation='relu'))
         model.add(Dropout(0.5))
         #model.add(MaxPooling2D(pool_size=(2, 2)))
 
-        model.add(Conv2D(64, (2, 2), padding='same', activation='relu'))
+        model.add(Conv2D(64, (2, 2), padding='same'))
         model.add(Conv2D(64, (3, 3), padding='same', activation='relu', name='layer_64'))
         model.add(Dropout(0.5))
 
