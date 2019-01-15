@@ -74,7 +74,6 @@ class lossPointPredict:
         model.add(Dropout(0.5))
 
         model.add(Flatten())
-        model.add(Dense(1024, activation='relu'))
         model.add(Dense(256, activation='relu'))
         model.add(Dense(6, activation='softmax'))
     
@@ -146,7 +145,7 @@ def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
 
             x, y = dg.lp_data_gen(item)
             batch_x.append(np.reshape(x, SHAPE))
-            batch_y.append([1])
+            batch_y.append(y)
             count += 1
 
             if count == SUB_DATA_SIZE:
@@ -154,9 +153,8 @@ def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
                 count = 0
                 batch_x = []
                 batch_y = []
-            else:
-                if not batch_x:
-                    yield np.array(batch_x), np.array(batch_y)
+        if batch_x:
+            yield np.array(batch_x), np.array(batch_y)
 
 
 if __name__ == '__main__':

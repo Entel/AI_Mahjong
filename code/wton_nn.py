@@ -36,8 +36,8 @@ SUB_DATA_SIZE = 40000
 TRAININGDATA = '../xml_data/hozyu.dat'
 VALIDATIONDATA = '../xml_data/wton_validation.dat'
 WTON_PARAM_PATH = '../model/wton_nn.model'
-CHECKPOINT_PATH = '../checkpoint/wton/wton.improvement_{val_acc:.3f}.hdf5'
-T_CHECKPOINT_PATH = '../checkpoint/wton/wton.t_improvement_{acc:.3f}.hdf5'
+CHECKPOINT_PATH = '../checkpoint/wton/wton.improvement_{val_loss:.3f}.hdf5'
+T_CHECKPOINT_PATH = '../checkpoint/wton/wton.t_improvement_{loss:.3f}.hdf5'
 
 class waitingOrNot:
     def __init__(self):
@@ -46,12 +46,12 @@ class waitingOrNot:
                                     write_graph = True,
                                     embeddings_freq = 0)
         self.checkpoint = ModelCheckpoint(CHECKPOINT_PATH, 
-                                    monitor='val_acc', 
+                                    monitor='val_loss', 
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='auto')
         self.t_checkpoint = ModelCheckpoint(T_CHECKPOINT_PATH, 
-                                    monitor='acc', 
+                                    monitor='loss', 
                                     verbose=1, 
                                     save_best_only=True, 
                                     mode='auto')
@@ -77,7 +77,7 @@ class waitingOrNot:
         model.add(Dense(512, activation='relu'))
         model.add(Dense(256, activation='relu'))
         model.add(Dense(1))
-        model.add(Activation('softmax'))
+        model.add(Activation('relu'))
     
         adam = Adam(lr=10e-6)
         model.compile(loss='mean_squared_error', optimizer=adam, metrics=['mse'])
@@ -152,9 +152,8 @@ def generate_data_from_file(path=TRAININGDATA, sub_data_size=SUB_DATA_SIZE):
                 count = 0
                 batch_x = []
                 batch_y = []
-            else:
-                if not batch_x:
-                    yield np.array(batch_x), np.array(batch_y)
+        if batch_x:
+            yield np.array(batch_x), np.array(batch_y)
 
  
 if __name__ == '__main__':
