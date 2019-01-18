@@ -61,7 +61,7 @@ class lossPointPredict:
         model.add(Conv2D(512, (4, 4), padding='same', activation='relu', input_shape=input_shape))
         model.add(BatchNormalization())
         model.add(Conv2D(512, (3, 3), padding='same'))
-        model.add(Conv2D(512, (2, 2), padding='same', name='layer_512'))
+        model.add(Conv2D(512, (2, 2), padding='same', name='layer_512', activation='relu'))
         model.add(Dropout(0.25))
 
         model.add(Conv2D(256, (4, 4), padding='same'))
@@ -69,12 +69,12 @@ class lossPointPredict:
         model.add(Dropout(0.5))
         #model.add(MaxPooling2D(pool_size=(2, 2)))
 
-        model.add(Conv2D(64, (4, 4), padding='same'))
-        model.add(Conv2D(64, (3, 3), padding='same', activation='relu', name='layer_64'))
-        model.add(Dropout(0.5))
+        model.add(Conv2D(128, (4, 4), padding='same'))
+        model.add(Conv2D(128, (3, 3), padding='same', activation='relu', name='layer_64'))
+        model.add(Dropout(0.25))
 
         model.add(Flatten())
-        model.add(Dense(256, activation='relu'))
+        model.add(Dense(128, activation='relu'))
         model.add(Dense(6, activation='softmax'))
     
         adam = Adam(lr=1e-06, beta_1=0.9, beta_2=0.999, epsilon=1e-08, decay=0.0)
